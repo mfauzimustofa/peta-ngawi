@@ -48,7 +48,7 @@
     </p>
     <hr>
     <p><b>Sumber Data:</b><br>
-      Data RTLH Dinas Perumahan Kabupaten Ngawi
+      Dinas Perumahan dan Kawasan Permukiman Kabupaten Ngawi
     </p>
   </div>
 
@@ -59,10 +59,9 @@
 
 <!-- ================= SECTION DATA ================= -->
 <section id="data" class="section">
-  <h3>Data RTLH</h3>
+  <h3>Data RTLH 2021–2025</h3>
   <p>
-    Halaman ini akan menampilkan statistik dan rekap RTLH
-    Kabupaten Ngawi tahun 2021–2025.
+    Bagian ini akan dikembangkan menjadi dashboard statistik RTLH.
   </p>
 </section>
 
@@ -70,8 +69,8 @@
 <section id="tentang" class="section">
   <h3>Tentang</h3>
   <p>
-    WebGIS ini dikembangkan untuk mendukung transparansi
-    dan monitoring program RTLH berbasis spasial.
+    WebGIS ini dikembangkan untuk mendukung transparansi,
+    monitoring, dan evaluasi program RTLH berbasis spasial.
   </p>
 </section>
 
@@ -92,16 +91,15 @@
 <!-- ================= JAVASCRIPT ================= -->
 <script>
 
-// Inisialisasi Map
+// ===== INIT MAP =====
 var map = L.map('map');
 
-// Basemap OSM
+// ===== BASEMAP =====
 var osm = L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   { attribution: '&copy; OpenStreetMap' }
 );
 
-// Basemap Satelit
 var esriSat = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   { attribution: 'Tiles © Esri' }
@@ -109,7 +107,7 @@ var esriSat = L.tileLayer(
 
 osm.addTo(map);
 
-// Load GeoJSON
+// ===== LOAD GEOJSON =====
 fetch('bts_ngawikab2.geojson')
 .then(response => response.json())
 .then(data => {
@@ -117,9 +115,9 @@ fetch('bts_ngawikab2.geojson')
   var batasLayer = L.geoJSON(data, {
 
     style: {
-      color: "black",
+      color: "#333",
       weight: 2,
-      fillColor: "gray",
+      fillColor: "#808080",
       fillOpacity: 0.4
     },
 
@@ -149,7 +147,7 @@ fetch('bts_ngawikab2.geojson')
               <td>${p.WADMPR}</td>
             </tr>
             <tr>
-              <td><b>Kode Kab</b></td>
+              <td><b>Kode</b></td>
               <td>${p.KDPKAB}</td>
             </tr>
             <tr>
