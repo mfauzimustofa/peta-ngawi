@@ -1,5 +1,9 @@
 /* ================= GLOBAL ================= */
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   height: 100%;
   margin: 0;
@@ -23,6 +27,11 @@ body {
   align-items: center;
   flex-wrap: wrap;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+
+  /* Sticky navbar */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .nav-left {
@@ -77,6 +86,11 @@ body {
   overflow-y: auto;
   border-right: 1px solid #ddd;
   box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+  transition: 0.3s;
+}
+
+.sidebar:hover {
+  box-shadow: 4px 0 12px rgba(0,0,0,0.1);
 }
 
 .sidebar h3 {
@@ -94,9 +108,14 @@ body {
 /* ================= SECTION ================= */
 
 .section {
-  padding: 20px;
+  padding: 40px 20px;
   background: #ffffff;
   border-top: 1px solid #ddd;
+}
+
+.section h3 {
+  margin-top: 0;
+  color: #1f3c88;
 }
 
 /* ================= FOOTER ================= */
