@@ -1,56 +1,5 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WebGIS RTLH Kabupaten Ngawi 2021–2025</title>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<link rel="stylesheet" href="style.css">
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-</head>
-
-<body>
-
-<!-- ================= HEADER ================= -->
-<header class="header">
-  <div class="header-title">
-    🏠 WebGIS RTLH Kabupaten Ngawi 2021–2025
-  </div>
-  <div class="header-sub">
-    Sebaran Penerima Bantuan Rumah Tidak Layak Huni (RTLH)
-  </div>
-</header>
-
-<!-- ================= CONTROL PANEL ================= -->
-<div class="control-panel">
-  <div>
-    <label for="tahun">Tahun:</label>
-    <select id="tahun">
-      <option value="2021">2021</option>
-      <option value="2022">2022</option>
-      <option value="2023">2023</option>
-      <option value="2024">2024</option>
-      <option value="2025" selected>2025</option>
-    </select>
-  </div>
-
-  <div class="stat-box">
-    Total Penerima:
-    <span id="totalPenerima">0</span> Unit
-  </div>
-</div>
-
-<!-- ================= MAP ================= -->
-<div id="map"></div>
-
-<!-- ================= FOOTER ================= -->
-<footer>
-  Dinas Perumahan dan Kawasan Permukiman Kabupaten Ngawi  
-  © 2026 Fauzi Mustofa
-</footer>
-
 <script>
+
 var map = L.map('map').setView([-7.4, 111.4], 10);
 
 L.tileLayer(
@@ -58,9 +7,53 @@ L.tileLayer(
   { attribution: '&copy; OpenStreetMap' }
 ).addTo(map);
 
-// Nanti kita sambungkan dengan geojson & filter tahun di tahap berikutnya
+function getColor(value) {
+  return value >= 5 ? "#d73027" :
+         value >= 3 ? "#fc8d59" :
+         value >= 1 ? "#91cf60" :
+                      "#e0e0e0";
+}
+
+fetch('rtlh_2025.geojson')
+.then(response => response.json())
+.then(data => {
+
+  var total = 0;
+
+  var desaLayer = L.geoJSON(data, {
+
+    style: function(feature) {
+      var jumlah = feature.properties.Jml_PB || 0;
+
+      return {
+        fillColor: getColor(jumlah),
+        weight: 1,
+        color: "#666",
+        fillOpacity: 0.7
+      };
+    },
+
+    onEachFeature: function(feature, layer) {
+
+      var desa = feature.properties.DESA || "-";
+      var kec = feature.properties.KECAMATAN || "-";
+      var jumlah = feature.properties.Jml_PB || 0;
+
+      total += jumlah;
+
+      layer.bindPopup(
+        "<b>Desa:</b> " + desa + "<br>" +
+        "<b>Kecamatan:</b> " + kec + "<br>" +
+        "<b>Penerima RTLH 2025:</b> " + jumlah + " unit"
+      );
+    }
+
+  }).addTo(map);
+
+  map.fitBounds(desaLayer.getBounds());
+
+  document.getElementById("totalPenerima").innerText = total;
+
+});
 
 </script>
-
-</body>
-</html>
