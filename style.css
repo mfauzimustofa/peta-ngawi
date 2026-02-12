@@ -1,0 +1,80 @@
+/* ===== GLOBAL ===== */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f5f7fa;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: linear-gradient(90deg, #1f3c88, #2952cc);
+  color: white;
+  padding: 18px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ===== LAYOUT ===== */
+.container {
+  display: flex;
+  height: calc(100vh - 120px);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 320px;
+  background: white;
+  padding: 20px;
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  color: #1f3c88;
+}
+
+/* ===== MAP ===== */
+#map {
+  flex: 1;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: #1f3c88;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+}
+
+/* ===== POPUP TABLE ===== */
+.leaflet-popup-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.leaflet-popup-content th {
+  background: #1f3c88;
+  color: white;
+  padding: 5px;
+}
+
+.leaflet-popup-content td {
+  padding: 4px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* ===== LEGEND ===== */
+.legend {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.3);
+  font-size: 14px;
+}
