@@ -1,3 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebGIS RTLH 2025</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+  🏠 WebGIS RTLH Kabupaten Ngawi 2025
+</header>
+
+<div class="control-panel">
+  Total Penerima 2025:
+  <span id="totalPenerima">0</span> Unit
+</div>
+
+<div id="map"></div>
+
+<footer>
+  © 2026 Fauzi Mustofa
+</footer>
+
 <script>
 
 var map = L.map('map').setView([-7.4, 111.4], 10);
@@ -15,16 +45,15 @@ function getColor(value) {
 }
 
 fetch('PB RTLH 2025.geojson')
-.then(response => response.json())
+.then(res => res.json())
 .then(data => {
 
   var total = 0;
 
-  var desaLayer = L.geoJSON(data, {
+  var layer = L.geoJSON(data, {
 
     style: function(feature) {
       var jumlah = feature.properties.Jml_PB || 0;
-
       return {
         fillColor: getColor(jumlah),
         weight: 1,
@@ -44,16 +73,19 @@ fetch('PB RTLH 2025.geojson')
       layer.bindPopup(
         "<b>Desa:</b> " + desa + "<br>" +
         "<b>Kecamatan:</b> " + kec + "<br>" +
-        "<b>Penerima RTLH 2025:</b> " + jumlah + " unit"
+        "<b>Penerima:</b> " + jumlah
       );
     }
 
   }).addTo(map);
 
-  map.fitBounds(desaLayer.getBounds());
+  map.fitBounds(layer.getBounds());
 
   document.getElementById("totalPenerima").innerText = total;
 
 });
 
 </script>
+
+</body>
+</html>
