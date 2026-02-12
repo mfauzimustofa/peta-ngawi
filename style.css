@@ -1,86 +1,57 @@
 /* ================= GLOBAL ================= */
 
-html {
-  scroll-behavior: smooth;
-}
-
-html, body {
+body {
   margin: 0;
-  padding: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
   background: #f4f6f9;
 }
 
-/* ================= NAVBAR ================= */
+/* ================= HEADER ================= */
 
-.navbar {
+.header {
   background: linear-gradient(90deg, #1f3c88, #2952cc);
   color: white;
-  padding: 14px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  padding: 18px 20px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-}
-
-.logo {
+.header-title {
   font-size: 20px;
-  margin-right: 8px;
-}
-
-.nav-title {
-  font-size: 18px;
   font-weight: bold;
 }
 
-.nav-menu a {
-  color: white;
-  text-decoration: none;
-  margin-left: 18px;
+.header-sub {
   font-size: 14px;
-  padding-bottom: 4px;
-  transition: 0.2s;
+  opacity: 0.9;
 }
 
-.nav-menu a:hover {
-  opacity: 0.8;
-}
+/* ================= CONTROL PANEL ================= */
 
-.nav-menu a.active {
-  border-bottom: 2px solid white;
-}
-
-/* ================= SECTION ================= */
-
-.section {
-  padding: 50px 20px;
+.control-panel {
   background: white;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid #ddd;
 }
 
-.section h2 {
-  margin-top: 0;
+.control-panel select {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.stat-box {
+  font-weight: bold;
   color: #1f3c88;
 }
 
-/* ================= MAP CONTAINER ================= */
-
-.container {
-  padding: 0;
-}
+/* ================= MAP ================= */
 
 #map {
   width: 100%;
-  height: 80vh;
+  height: 75vh;
 }
 
 /* ================= FOOTER ================= */
@@ -93,37 +64,18 @@ footer {
   font-size: 12px;
 }
 
-/* ================= POPUP STYLE ================= */
-
-.leaflet-popup-content {
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.leaflet-popup-content b {
-  color: #1f3c88;
-}
-
-/* ================= RESPONSIVE MOBILE ================= */
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
 
-  .navbar {
+  .control-panel {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .nav-menu {
-    margin-top: 8px;
-  }
-
-  .nav-menu a {
-    margin-left: 0;
-    margin-right: 12px;
+    gap: 8px;
   }
 
   #map {
-    height: 70vh;
+    height: 65vh;
   }
 
 }
