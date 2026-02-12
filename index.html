@@ -46,11 +46,24 @@ fetch('bts_ngawikab2.geojson')
       fillColor: "gray",
       fillOpacity: 0.5
     },
-    onEachFeature: function (feature, layer) {
-      if (feature.properties.NAMOBJ) {
-        layer.bindPopup(feature.properties.NAMOBJ);
-      }
-    }
+onEachFeature: function (feature, layer) {
+
+  var props = feature.properties;
+
+  var popupContent = "<table border='1' style='border-collapse:collapse; width:100%;'>" +
+                     "<tr><th colspan='2' style='background:#f2f2f2;'>Informasi Wilayah</th></tr>";
+
+  for (var key in props) {
+      popupContent += "<tr>" +
+                      "<td><b>" + key + "</b></td>" +
+                      "<td>" + props[key] + "</td>" +
+                      "</tr>";
+  }
+
+  popupContent += "</table>";
+
+  layer.bindPopup(popupContent);
+}
   }).addTo(map);
 });
   // ===== LEGEND =====
