@@ -11,6 +11,15 @@
 #map {
   height: 100vh;
 }
+
+.legend {
+  background: white;
+  padding: 10px;
+  line-height: 1.5;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  font-size: 14px;
+}
 </style>
 </head>
 
@@ -44,6 +53,17 @@ fetch('bts_ngawikab2.geojson')
     }
   }).addTo(map);
 });
+  // ===== LEGEND =====
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'info legend');
+    div.innerHTML += "<h4>Keterangan</h4>";
+    div.innerHTML += '<i style="background: gray; width: 18px; height: 18px; display: inline-block; margin-right: 5px;"></i> Batas Kabupaten Ngawi<br>';
+    return div;
+};
+
+legend.addTo(map);
 </script>
 
 </body>
