@@ -62,6 +62,36 @@ fetch('bts_ngawikab2.geojson')
 
     onEachFeature: function (feature, layer) {
 
+  var p = feature.properties;
+
+  var popupContent = `
+    <div style="min-width:220px">
+      <h4 style="
+        margin:0 0 8px 0;
+        padding:6px;
+        background:#1f3c88;
+        color:white;
+        text-align:center;
+        border-radius:4px;">
+        ${p.NAMOBJ || 'Wilayah'}
+      </h4>
+
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <tr>
+          <td><b>Kode</b></td>
+          <td>${p.KODE || '-'}</td>
+        </tr>
+        <tr>
+          <td><b>Luas</b></td>
+          <td>${p.LUAS || '-'}</td>
+        </tr>
+      </table>
+    </div>
+  `;
+
+  layer.bindPopup(popupContent);
+}
+
       var props = feature.properties;
       var popupContent = "<table border='1' style='border-collapse:collapse; width:100%;'>" +
                          "<tr><th colspan='2'>Informasi Wilayah</th></tr>";
