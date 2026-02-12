@@ -2,22 +2,20 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Peta Batas Ngawi</title>
+<title>WebGIS Kabupaten Ngawi</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
-#map {
-  height: 100vh;
-}
+body { margin:0; }
+#map { height: 100vh; }
 
 .legend {
   background: white;
   padding: 10px;
-  line-height: 1.5;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
   font-size: 14px;
 }
 </style>
@@ -27,57 +25,98 @@
 <div id="map"></div>
 
 <script>
-var map = L.map('map').setView([-7.43, 111.39], 10);
 
-L.tileLayer(
+// ===== MAP =====
+var map = L.map('map');
+
+// ===== BASEMAP =====
+var osm = L.tileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  { attribution: '&copy; OpenStreetMap' }
+);
+
+var esriSat = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  {
-    attribution: 'Tiles © Esri'
-  }
-).addTo(map);
+  { attribution: 'Tiles © Esri' }
+);
+
+osm.addTo(map);
+
+// ===== LOAD GEOJSON =====
+var batasLayer;
 
 fetch('bts_ngawikab2.geojson')
 .then(response => response.json())
 .then(data => {
-  L.geoJSON(data, {
+
+  batasLayer = L.geoJSON(data, {
+
     style: {
       color: "black",
       weight: 2,
       fillColor: "gray",
-      fillOpacity: 0.5
+      fillOpacity: 0.4
     },
-onEachFeature: function (feature, layer) {
 
-  var props = feature.properties;
+    onEachFeature: function (feature, layer) {
 
-  var popupContent = "<table border='1' style='border-collapse:collapse; width:100%;'>" +
-                     "<tr><th colspan='2' style='background:#f2f2f2;'>Informasi Wilayah</th></tr>";
+      // Hover effect
+      layer.on({
+        mouseover: function(e) {
+          e.target.setStyle({ fillOpacity: 0.7 });
+        },
+        mouseout: function(e) {
+          batasLayer.resetStyle(e.target);
+        }
+      });
 
-  for (var key in props) {
-      popupContent += "<tr>" +
-                      "<td><b>" + key + "</b></td>" +
-                      "<td>" + props[key] + "</td>" +
-                      "</tr>";
-  }
+      // Popup tabel
+      var props = feature.properties;
+      var popupContent = "<table border='1' style='border-collapse:collapse; width:100%;'>" +
+                         "<tr><th colspan='2' style='background:#f2f2f2;'>Informasi Wilayah</th></tr>";
 
-  popupContent += "</table>";
+      for (var key in props) {
+        popupContent += "<tr><td><b>" + key + "</b></td><td>" + props[key] + "</td></tr>";
+      }
 
-  layer.bindPopup(popupContent);
-}
+      popupContent += "</table>";
+
+      layer.bindPopup(popupContent);
+    }
+
   }).addTo(map);
-});
-  // ===== LEGEND =====
-var legend = L.control({position: 'bottomright'});
 
-legend.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'info legend');
-    div.innerHTML += "<h4>Keterangan</h4>";
-    div.innerHTML += '<i style="background: gray; width: 18px; height: 18px; display: inline-block; margin-right: 5px;"></i> Batas Kabupaten Ngawi<br>';
+  // Zoom otomatis ke batas
+  map.fitBounds(batasLayer.getBounds());
+
+  // Layer Control
+  var baseMaps = {
+    "Peta Jalan": osm,
+    "Satelit": esriSat
+  };
+
+  var overlayMaps = {
+    "Batas Kabupaten Ngawi": batasLayer
+  };
+
+  L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+  // Legend
+  var legend = L.control({position: 'bottomright'});
+
+  legend.onAdd = function () {
+    var div = L.DomUtil.create('div', 'legend');
+    div.innerHTML =
+      "<b>Keterangan</b><br><br>" +
+      "<span style='display:inline-block;width:18px;height:18px;background:gray;margin-right:6px;'></span>" +
+      "Batas Kabupaten Ngawi";
     return div;
-};
+  };
 
-legend.addTo(map);
+  legend.addTo(map);
+
+});
+
 </script>
-
 </body>
 </html>
