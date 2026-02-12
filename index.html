@@ -5,7 +5,7 @@
 <title>WebGIS Kabupaten Ngawi</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 </head>
@@ -62,45 +62,40 @@ fetch('bts_ngawikab2.geojson')
 
     onEachFeature: function (feature, layer) {
 
-  var p = feature.properties;
+      var p = feature.properties;
 
-  var popupContent = `
-    <div style="min-width:220px">
-      <h4 style="
-        margin:0 0 8px 0;
-        padding:6px;
-        background:#1f3c88;
-        color:white;
-        text-align:center;
-        border-radius:4px;">
-        ${p.NAMOBJ || 'Wilayah'}
-      </h4>
+      var popupContent = `
+        <div style="min-width:230px">
+          <h4 style="
+            margin:0 0 8px 0;
+            padding:8px;
+            background:#1f3c88;
+            color:white;
+            text-align:center;
+            border-radius:6px;">
+            ${p.NAMOBJ}
+          </h4>
 
-      <table style="width:100%; border-collapse:collapse; font-size:13px;">
-        <tr>
-          <td><b>Kode</b></td>
-          <td>${p.KODE || '-'}</td>
-        </tr>
-        <tr>
-          <td><b>Luas</b></td>
-          <td>${p.LUAS || '-'}</td>
-        </tr>
-      </table>
-    </div>
-  `;
-
-  layer.bindPopup(popupContent);
-}
-
-      var props = feature.properties;
-      var popupContent = "<table border='1' style='border-collapse:collapse; width:100%;'>" +
-                         "<tr><th colspan='2'>Informasi Wilayah</th></tr>";
-
-      for (var key in props) {
-        popupContent += "<tr><td><b>" + key + "</b></td><td>" + props[key] + "</td></tr>";
-      }
-
-      popupContent += "</table>";
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <tr>
+              <td><b>Kabupaten</b></td>
+              <td>${p.WADMKK}</td>
+            </tr>
+            <tr>
+              <td><b>Provinsi</b></td>
+              <td>${p.WADMPR}</td>
+            </tr>
+            <tr>
+              <td><b>Kode Kab</b></td>
+              <td>${p.KDPKAB}</td>
+            </tr>
+            <tr>
+              <td><b>Luas</b></td>
+              <td>${Number(p.LUASWH).toFixed(2)} km²</td>
+            </tr>
+          </table>
+        </div>
+      `;
 
       layer.bindPopup(popupContent);
     }
