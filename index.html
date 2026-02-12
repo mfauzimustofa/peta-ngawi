@@ -1,118 +1,64 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebGIS RTLH Kabupaten Ngawi</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebGIS RTLH Kabupaten Ngawi 2021–2025</title>
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<header class="navbar">
-  <div class="nav-left">
-    <span class="logo">🏠</span>
-    <span class="nav-title">WebGIS RTLH Kabupaten Ngawi</span>
+<!-- ================= HEADER ================= -->
+<header class="header">
+  <div class="header-title">
+    🏠 WebGIS RTLH Kabupaten Ngawi 2021–2025
   </div>
-  <nav class="nav-menu">
-    <a href="#beranda" class="active">Beranda</a>
-    <a href="#peta">Peta</a>
-    <a href="#tentang">Tentang</a>
-  </nav>
+  <div class="header-sub">
+    Sebaran Penerima Bantuan Rumah Tidak Layak Huni (RTLH)
+  </div>
 </header>
 
-<!-- ================= BERANDA ================= -->
-<section id="beranda" class="section">
-  <h2>Selamat Datang</h2>
-  <p>
-    WebGIS ini menampilkan sebaran penerima bantuan
-    Rumah Tidak Layak Huni (RTLH) Kabupaten Ngawi Tahun 2025.
-  </p>
-</section>
+<!-- ================= CONTROL PANEL ================= -->
+<div class="control-panel">
+  <div>
+    <label for="tahun">Tahun:</label>
+    <select id="tahun">
+      <option value="2021">2021</option>
+      <option value="2022">2022</option>
+      <option value="2023">2023</option>
+      <option value="2024">2024</option>
+      <option value="2025" selected>2025</option>
+    </select>
+  </div>
 
-<!-- ================= PETA ================= -->
-<section id="peta" class="container">
-  <div id="map"></div>
-</section>
+  <div class="stat-box">
+    Total Penerima:
+    <span id="totalPenerima">0</span> Unit
+  </div>
+</div>
 
-<!-- ================= TENTANG ================= -->
-<section id="tentang" class="section">
-  <h2>Tentang Data</h2>
-  <p>
-    Data merupakan jumlah penerima bantuan RTLH Tahun 2025
-    berdasarkan desa di Kabupaten Ngawi.
-  </p>
-</section>
+<!-- ================= MAP ================= -->
+<div id="map"></div>
 
 <!-- ================= FOOTER ================= -->
 <footer>
-  © 2026 Fauzi Mustofa | WebGIS RTLH Kabupaten Ngawi
+  Dinas Perumahan dan Kawasan Permukiman Kabupaten Ngawi  
+  © 2026 Fauzi Mustofa
 </footer>
 
-<!-- ================= JAVASCRIPT ================= -->
 <script>
-
-// INIT MAP
 var map = L.map('map').setView([-7.4, 111.4], 10);
 
-// BASEMAP
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   { attribution: '&copy; OpenStreetMap' }
 ).addTo(map);
 
-// COLOR FUNCTION
-function getColor(value) {
-  return value >= 5 ? "#d73027" :
-         value >= 3 ? "#fc8d59" :
-         value >= 1 ? "#91cf60" :
-                      "#dddddd";
-}
-
-// LOAD GEOJSON
-fetch('rtlh_ngawi_2025.geojson')
-.then(response => response.json())
-.then(data => {
-
-  var desaLayer = L.geoJSON(data, {
-
-    style: function(feature) {
-      var jumlah = feature.properties.rtlh_2025_fix;
-
-      return {
-        fillColor: getColor(jumlah),
-        weight: 1,
-        color: "#666",
-        fillOpacity: 0.7
-      };
-    },
-
-    onEachFeature: function(feature, layer) {
-
-      var desa = feature.properties.DESA;
-      var kec = feature.properties.KECAMATAN;
-      var jumlah = feature.properties.rtlh_2025_fix;
-
-      layer.bindPopup(
-        "<b>Desa:</b> " + desa + "<br>" +
-        "<b>Kecamatan:</b> " + kec + "<br>" +
-        "<b>Penerima RTLH 2025:</b> " + jumlah + " unit"
-      );
-    }
-
-  }).addTo(map);
-
-  map.fitBounds(desaLayer.getBounds());
-});
+// Nanti kita sambungkan dengan geojson & filter tahun di tahap berikutnya
 
 </script>
 
