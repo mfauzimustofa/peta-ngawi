@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Peta Batas Administrasi</title>
+<title>Peta Batas Ngawi</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -20,13 +20,11 @@
 <script>
 var map = L.map('map').setView([-7.43, 111.39], 10);
 
-// Basemap gratis
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap'
 }).addTo(map);
 
-// Load GeoJSON
-fetch('namawilayah.geojson')
+fetch('bts_ngawikab2.geojson')
 .then(response => response.json())
 .then(data => {
   L.geoJSON(data, {
