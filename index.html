@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebGIS RTLH Kabupaten Ngawi 2025</title>
+  <title>WebGIS RTLH Kabupaten Ngawi</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
@@ -17,32 +17,60 @@
 
 <body>
 
+<!-- ================= NAVBAR ================= -->
 <header class="navbar">
-  <div class="nav-title">
-    🏠 WebGIS RTLH Kabupaten Ngawi 2025
+  <div class="nav-left">
+    <span class="logo">🏠</span>
+    <span class="nav-title">WebGIS RTLH Kabupaten Ngawi</span>
   </div>
+  <nav class="nav-menu">
+    <a href="#beranda" class="active">Beranda</a>
+    <a href="#peta">Peta</a>
+    <a href="#tentang">Tentang</a>
+  </nav>
 </header>
 
-<div class="container">
-  <div id="map"></div>
-</div>
+<!-- ================= BERANDA ================= -->
+<section id="beranda" class="section">
+  <h2>Selamat Datang</h2>
+  <p>
+    WebGIS ini menampilkan sebaran penerima bantuan
+    Rumah Tidak Layak Huni (RTLH) Kabupaten Ngawi Tahun 2025.
+  </p>
+</section>
 
+<!-- ================= PETA ================= -->
+<section id="peta" class="container">
+  <div id="map"></div>
+</section>
+
+<!-- ================= TENTANG ================= -->
+<section id="tentang" class="section">
+  <h2>Tentang Data</h2>
+  <p>
+    Data merupakan jumlah penerima bantuan RTLH Tahun 2025
+    berdasarkan desa di Kabupaten Ngawi.
+  </p>
+</section>
+
+<!-- ================= FOOTER ================= -->
 <footer>
   © 2026 Fauzi Mustofa | WebGIS RTLH Kabupaten Ngawi
 </footer>
 
+<!-- ================= JAVASCRIPT ================= -->
 <script>
 
-// ================= INIT MAP =================
+// INIT MAP
 var map = L.map('map').setView([-7.4, 111.4], 10);
 
-// ================= BASEMAP =================
+// BASEMAP
 L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   { attribution: '&copy; OpenStreetMap' }
 ).addTo(map);
 
-// ================= COLOR FUNCTION =================
+// COLOR FUNCTION
 function getColor(value) {
   return value >= 5 ? "#d73027" :
          value >= 3 ? "#fc8d59" :
@@ -50,7 +78,7 @@ function getColor(value) {
                       "#dddddd";
 }
 
-// ================= LOAD GEOJSON =================
+// LOAD GEOJSON
 fetch('rtlh_ngawi_2025.geojson')
 .then(response => response.json())
 .then(data => {
