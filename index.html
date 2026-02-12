@@ -11,8 +11,32 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- Leaflet JS -->
-  <script>
+  <!-- Leaflet JS (WAJIB pakai src) -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<header class="navbar">
+  <div class="nav-left">
+    <span class="logo">🏠</span>
+    <span class="nav-title">WebGIS RTLH Kabupaten Ngawi 2025</span>
+  </div>
+</header>
+
+<!-- ================= MAP CONTAINER ================= -->
+<div class="container">
+  <div id="map"></div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  © 2026 Fauzi Mustofa | WebGIS RTLH Kabupaten Ngawi
+</footer>
+
+<!-- ================= JAVASCRIPT ================= -->
+<script>
 
 // ================= DATA RTLH 2025 =================
 const rtlhData = {
@@ -25,7 +49,7 @@ const rtlhData = {
   "GANDONG": 3,
   "KENONGOREJO": 5,
   "KERSOHARJO": 3,
-  "WIDODAREN": 3,
+  "WIDODAREN": 5,
   "MACANAN": 3,
   "GIRIMULYO": 3,
   "TALANG": 1,
@@ -67,8 +91,7 @@ const rtlhData = {
   "KAUMAN": 4,
   "KAYUTREJO": 4,
   "WALIKUKUN": 3,
-  "BANYUBIRU": 4,
-  "WIDODAREN": 5
+  "BANYUBIRU": 4
 };
 
 // ================= INIT MAP =================
@@ -88,7 +111,7 @@ function getColor(value) {
                       "#dddddd";
 }
 
-// ================= LOAD GEOJSON =================
+// ================= LOAD DESA GEOJSON =================
 fetch('bts_desa.geojson')
 .then(response => response.json())
 .then(data => {
@@ -102,7 +125,6 @@ fetch('bts_desa.geojson')
       return {
         fillColor: getColor(jumlah),
         weight: 1,
-        opacity: 1,
         color: "#666",
         fillOpacity: 0.7
       };
@@ -123,168 +145,6 @@ fetch('bts_desa.geojson')
   }).addTo(map);
 
   map.fitBounds(desaLayer.getBounds());
-});
-
-</script>
-</head>
-
-<body>
-
-<!-- ================= NAVBAR ================= -->
-<header class="navbar">
-  <div class="nav-left">
-    <span class="logo">🏠</span>
-    <span class="nav-title">WebGIS RTLH Kabupaten Ngawi</span>
-  </div>
-
-  <nav class="nav-menu">
-    <a href="#beranda" class="active">Beranda</a>
-    <a href="#peta">Peta</a>
-    <a href="#data">Data</a>
-    <a href="#tentang">Tentang</a>
-    <a href="#kontak">Kontak</a>
-  </nav>
-</header>
-
-<!-- ================= MAIN CONTENT ================= -->
-<div class="container">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar" id="beranda">
-    <h3>Informasi</h3>
-    <p>
-      WebGIS ini menampilkan data Rumah Tidak Layak Huni (RTLH)
-      Kabupaten Ngawi tahun 2021–2025.
-    </p>
-    <p>
-      Klik pada wilayah untuk melihat informasi atribut.
-    </p>
-    <hr>
-    <p><b>Sumber Data:</b><br>
-      Dinas Perumahan dan Kawasan Permukiman Kabupaten Ngawi
-    </p>
-  </div>
-
-  <!-- MAP -->
-  <div id="map"></div>
-
-</div>
-
-<!-- ================= SECTION DATA ================= -->
-<section id="data" class="section">
-  <h3>Data RTLH 2021–2025</h3>
-  <p>
-    Bagian ini akan dikembangkan menjadi dashboard statistik RTLH.
-  </p>
-</section>
-
-<!-- ================= SECTION TENTANG ================= -->
-<section id="tentang" class="section">
-  <h3>Tentang</h3>
-  <p>
-    WebGIS ini dikembangkan untuk mendukung transparansi,
-    monitoring, dan evaluasi program RTLH berbasis spasial.
-  </p>
-</section>
-
-<!-- ================= SECTION KONTAK ================= -->
-<section id="kontak" class="section">
-  <h3>Kontak</h3>
-  <p>
-    Pengembang: Fauzi Mustofa<br>
-    Kabupaten Ngawi
-  </p>
-</section>
-
-<!-- ================= FOOTER ================= -->
-<footer>
-  © 2026 Fauzi Mustofa | WebGIS RTLH Kabupaten Ngawi
-</footer>
-
-<!-- ================= JAVASCRIPT ================= -->
-<script>
-
-// ===== INIT MAP =====
-var map = L.map('map');
-
-// ===== BASEMAP =====
-var osm = L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  { attribution: '&copy; OpenStreetMap' }
-);
-
-var esriSat = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  { attribution: 'Tiles © Esri' }
-);
-
-osm.addTo(map);
-
-// ===== LOAD GEOJSON =====
-fetch('bts_ngawikab2.geojson')
-.then(response => response.json())
-.then(data => {
-
-  var batasLayer = L.geoJSON(data, {
-
-    style: {
-      color: "#333",
-      weight: 2,
-      fillColor: "#808080",
-      fillOpacity: 0.4
-    },
-
-    onEachFeature: function (feature, layer) {
-
-      var p = feature.properties;
-
-      var popupContent = `
-        <div style="min-width:230px">
-          <h4 style="
-            margin:0 0 8px 0;
-            padding:8px;
-            background:#1f3c88;
-            color:white;
-            text-align:center;
-            border-radius:6px;">
-            ${p.NAMOBJ}
-          </h4>
-
-          <table style="width:100%; border-collapse:collapse; font-size:13px;">
-            <tr>
-              <td><b>Kabupaten</b></td>
-              <td>${p.WADMKK}</td>
-            </tr>
-            <tr>
-              <td><b>Provinsi</b></td>
-              <td>${p.WADMPR}</td>
-            </tr>
-            <tr>
-              <td><b>Kode</b></td>
-              <td>${p.KDPKAB}</td>
-            </tr>
-            <tr>
-              <td><b>Luas</b></td>
-              <td>${Number(p.LUASWH).toFixed(2)} km²</td>
-            </tr>
-          </table>
-        </div>
-      `;
-
-      layer.bindPopup(popupContent);
-    }
-
-  }).addTo(map);
-
-  map.fitBounds(batasLayer.getBounds());
-
-  var baseMaps = {
-    "Peta Jalan": osm,
-    "Satelit": esriSat
-  };
-
-  L.control.layers(baseMaps).addTo(map);
-
 });
 
 </script>
