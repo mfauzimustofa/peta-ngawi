@@ -78,3 +78,28 @@ footer {
   box-shadow: 0 0 12px rgba(0,0,0,0.3);
   font-size: 14px;
 }
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media (max-width: 768px) {
+
+  .container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  #map {
+    height: 70vh;
+  }
+
+  header {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+}
