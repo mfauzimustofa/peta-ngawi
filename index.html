@@ -12,7 +12,120 @@
   <link rel="stylesheet" href="style.css">
 
   <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+
+// ================= DATA RTLH 2025 =================
+const rtlhData = {
+  "BRINGIN": 1,
+  "MOJO": 3,
+  "KROMPOL": 4,
+  "SURUH": 2,
+  "DERO": 3,
+  "LEGOWETAN": 5,
+  "GANDONG": 3,
+  "KENONGOREJO": 5,
+  "KERSOHARJO": 3,
+  "WIDODAREN": 3,
+  "MACANAN": 3,
+  "GIRIMULYO": 3,
+  "TALANG": 1,
+  "GEMBOL": 3,
+  "SEKARJATI": 5,
+  "RINGINANOM": 3,
+  "SEMBUNG": 5,
+  "JATIREJO": 7,
+  "KIYONTEN": 3,
+  "BEGAL": 5,
+  "KAWU": 2,
+  "PELANGKIDUL": 3,
+  "WONOREJO": 3,
+  "JATIGEMBOL": 3,
+  "BANGUNREJO KIDUL": 3,
+  "PELANG LOR": 1,
+  "KEDUNGGALAR": 5,
+  "JATIMULYO": 5,
+  "SAMBIREJO": 5,
+  "KARANGTENGAH PRANDON": 4,
+  "BERAN": 5,
+  "KARANGASRI": 5,
+  "PADAS": 3,
+  "KWADUNGAN LOR": 3,
+  "BENDO": 4,
+  "SAMBIROTO": 3,
+  "BANJARANSARI": 5,
+  "BABADAN": 1,
+  "SUMBER": 3,
+  "PARAS": 3,
+  "GANDRI": 3,
+  "WARUKTENGAH": 3,
+  "JAMBANGAN": 3,
+  "TEMPURAN": 3,
+  "NGALE": 5,
+  "KARANGGENENG": 3,
+  "KETANGGUNG": 3,
+  "SINE": 3,
+  "KAUMAN": 4,
+  "KAYUTREJO": 4,
+  "WALIKUKUN": 3,
+  "BANYUBIRU": 4,
+  "WIDODAREN": 5
+};
+
+// ================= INIT MAP =================
+var map = L.map('map').setView([-7.4, 111.4], 10);
+
+// Basemap
+L.tileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  { attribution: '&copy; OpenStreetMap' }
+).addTo(map);
+
+// ================= COLOR FUNCTION =================
+function getColor(value) {
+  return value >= 5 ? "#d73027" :
+         value >= 3 ? "#fc8d59" :
+         value >= 1 ? "#91cf60" :
+                      "#dddddd";
+}
+
+// ================= LOAD GEOJSON =================
+fetch('bts_desa.geojson')
+.then(response => response.json())
+.then(data => {
+
+  var desaLayer = L.geoJSON(data, {
+
+    style: function(feature) {
+      const desaName = feature.properties.DESA || feature.properties.NAMDESA;
+      const jumlah = rtlhData[desaName] || 0;
+
+      return {
+        fillColor: getColor(jumlah),
+        weight: 1,
+        opacity: 1,
+        color: "#666",
+        fillOpacity: 0.7
+      };
+    },
+
+    onEachFeature: function(feature, layer) {
+      const desaName = feature.properties.DESA || feature.properties.NAMDESA;
+      const kec = feature.properties.KECAMATAN || "-";
+      const jumlah = rtlhData[desaName] || 0;
+
+      layer.bindPopup(`
+        <b>Desa:</b> ${desaName}<br>
+        <b>Kecamatan:</b> ${kec}<br>
+        <b>Penerima RTLH 2025:</b> ${jumlah} unit
+      `);
+    }
+
+  }).addTo(map);
+
+  map.fitBounds(desaLayer.getBounds());
+});
+
+</script>
 </head>
 
 <body>
