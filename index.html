@@ -8,28 +8,72 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
-body { margin:0; }
-#map { height: 100vh; }
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+}
 
-.legend {
-  background: white;
-  padding: 10px;
-  border-radius: 6px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.3);
-  font-size: 14px;
+header {
+  background:#1f3c88;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.container {
+  display:flex;
+  height: calc(100vh - 110px);
+}
+
+.sidebar {
+  width:300px;
+  background:#f4f4f4;
+  padding:15px;
+  overflow:auto;
+  border-right:1px solid #ddd;
+}
+
+#map {
+  flex:1;
+}
+
+footer {
+  background:#1f3c88;
+  color:white;
+  text-align:center;
+  padding:10px;
+  font-size:12px;
 }
 </style>
 </head>
 
 <body>
-<div id="map"></div>
+
+<header>
+WebGIS Batas Administrasi Kabupaten Ngawi
+</header>
+
+<div class="container">
+  <div class="sidebar">
+    <h3>Informasi</h3>
+    <p>WebGIS ini menampilkan batas administrasi Kabupaten Ngawi.</p>
+    <p>Klik pada wilayah untuk melihat informasi atribut.</p>
+    <hr>
+    <p><b>Sumber Data:</b><br>Data GeoJSON Kabupaten Ngawi</p>
+  </div>
+  <div id="map"></div>
+</div>
+
+<footer>
+© 2026 Fauzi Mustofa | WebGIS Kabupaten Ngawi
+</footer>
 
 <script>
 
-// ===== MAP =====
 var map = L.map('map');
 
-// ===== BASEMAP =====
 var osm = L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   { attribution: '&copy; OpenStreetMap' }
@@ -42,14 +86,11 @@ var esriSat = L.tileLayer(
 
 osm.addTo(map);
 
-// ===== LOAD GEOJSON =====
-var batasLayer;
-
 fetch('bts_ngawikab2.geojson')
 .then(response => response.json())
 .then(data => {
 
-  batasLayer = L.geoJSON(data, {
+  var batasLayer = L.geoJSON(data, {
 
     style: {
       color: "black",
@@ -60,20 +101,9 @@ fetch('bts_ngawikab2.geojson')
 
     onEachFeature: function (feature, layer) {
 
-      // Hover effect
-      layer.on({
-        mouseover: function(e) {
-          e.target.setStyle({ fillOpacity: 0.7 });
-        },
-        mouseout: function(e) {
-          batasLayer.resetStyle(e.target);
-        }
-      });
-
-      // Popup tabel
       var props = feature.properties;
       var popupContent = "<table border='1' style='border-collapse:collapse; width:100%;'>" +
-                         "<tr><th colspan='2' style='background:#f2f2f2;'>Informasi Wilayah</th></tr>";
+                         "<tr><th colspan='2'>Informasi Wilayah</th></tr>";
 
       for (var key in props) {
         popupContent += "<tr><td><b>" + key + "</b></td><td>" + props[key] + "</td></tr>";
@@ -86,37 +116,18 @@ fetch('bts_ngawikab2.geojson')
 
   }).addTo(map);
 
-  // Zoom otomatis ke batas
   map.fitBounds(batasLayer.getBounds());
 
-  // Layer Control
   var baseMaps = {
     "Peta Jalan": osm,
     "Satelit": esriSat
   };
 
-  var overlayMaps = {
-    "Batas Kabupaten Ngawi": batasLayer
-  };
-
-  L.control.layers(baseMaps, overlayMaps).addTo(map);
-
-  // Legend
-  var legend = L.control({position: 'bottomright'});
-
-  legend.onAdd = function () {
-    var div = L.DomUtil.create('div', 'legend');
-    div.innerHTML =
-      "<b>Keterangan</b><br><br>" +
-      "<span style='display:inline-block;width:18px;height:18px;background:gray;margin-right:6px;'></span>" +
-      "Batas Kabupaten Ngawi";
-    return div;
-  };
-
-  legend.addTo(map);
+  L.control.layers(baseMaps).addTo(map);
 
 });
 
 </script>
+
 </body>
 </html>
