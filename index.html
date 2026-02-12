@@ -2,8 +2,9 @@
 <html>
 <head>
 <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WebGIS Kabupaten Ngawi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>WebGIS RTLH Kabupaten Ngawi</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <link rel="stylesheet" href="style.css">
@@ -13,29 +14,86 @@
 
 <body>
 
-<header>
-WebGIS Batas Administrasi Kabupaten Ngawi
+<!-- ================= NAVBAR ================= -->
+<header class="navbar">
+
+  <div class="nav-left">
+    <span class="logo">🏠</span>
+    <span class="nav-title">WebGIS RTLH Kabupaten Ngawi</span>
+  </div>
+
+  <nav class="nav-menu">
+    <a href="#beranda" class="active">Beranda</a>
+    <a href="#peta">Peta</a>
+    <a href="#data">Data</a>
+    <a href="#tentang">Tentang</a>
+    <a href="#kontak">Kontak</a>
+  </nav>
+
 </header>
 
+<!-- ================= MAIN CONTENT ================= -->
 <div class="container">
-  <div class="sidebar">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="beranda">
     <h3>Informasi</h3>
-    <p>WebGIS ini menampilkan batas administrasi Kabupaten Ngawi.</p>
-    <p>Klik pada wilayah untuk melihat informasi atribut.</p>
+    <p>
+      WebGIS ini menampilkan data Rumah Tidak Layak Huni (RTLH)
+      Kabupaten Ngawi tahun 2021–2025.
+    </p>
+    <p>
+      Klik pada wilayah untuk melihat informasi atribut.
+    </p>
     <hr>
-    <p><b>Sumber Data:</b><br>Data GeoJSON Kabupaten Ngawi</p>
+    <p><b>Sumber Data:</b><br>
+      Data RTLH Dinas Perumahan Kabupaten Ngawi
+    </p>
   </div>
+
+  <!-- MAP -->
   <div id="map"></div>
+
 </div>
 
+<!-- ================= SECTION DATA ================= -->
+<section id="data" class="section">
+  <h3>Data RTLH</h3>
+  <p>
+    Halaman ini akan menampilkan statistik dan rekap RTLH
+    Kabupaten Ngawi tahun 2021–2025.
+  </p>
+</section>
+
+<!-- ================= SECTION TENTANG ================= -->
+<section id="tentang" class="section">
+  <h3>Tentang</h3>
+  <p>
+    WebGIS ini dikembangkan untuk mendukung transparansi
+    dan monitoring program RTLH berbasis spasial.
+  </p>
+</section>
+
+<!-- ================= SECTION KONTAK ================= -->
+<section id="kontak" class="section">
+  <h3>Kontak</h3>
+  <p>
+    Pengembang: Fauzi Mustofa<br>
+    Kabupaten Ngawi
+  </p>
+</section>
+
+<!-- ================= FOOTER ================= -->
 <footer>
-© 2026 Fauzi Mustofa | WebGIS Kabupaten Ngawi
+© 2026 Fauzi Mustofa | WebGIS RTLH Kabupaten Ngawi
 </footer>
 
+<!-- ================= JAVASCRIPT ================= -->
 <script>
 
 var map = L.map('map');
 
+// ===== BASEMAP =====
 var osm = L.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   { attribution: '&copy; OpenStreetMap' }
@@ -48,6 +106,7 @@ var esriSat = L.tileLayer(
 
 osm.addTo(map);
 
+// ===== LOAD GEOJSON =====
 fetch('bts_ngawikab2.geojson')
 .then(response => response.json())
 .then(data => {
