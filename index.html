@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <title>WebGIS RTLH Ngawi</title>
+  <meta charset="utf-8"/>
+  <title>WebGIS RTLH & BSPS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
@@ -16,6 +16,11 @@
     <option value="2022">2022</option>
     <option value="2024">2024</option>
     <option value="2025" selected>2025</option>
+  </select>
+
+  <select id="jenis">
+    <option value="RTLH">RTLH</option>
+    <option value="BSPS">BSPS</option>
   </select>
 </div>
 
@@ -31,69 +36,98 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 }).addTo(map);
 
 let geojsonLayer;
+let titikLayer;
 let dataGeojson;
 
-// ambil warna
-function getColor(jenis){
-  return jenis === "RTLH" ? "red" : "blue";
+// ================= WARNA CHOROPLETH =================
+function getColor(d){
+  return d > 50 ? '#084594' :
+         d > 30 ? '#2171b5' :
+         d > 20 ? '#4292c6' :
+         d > 10 ? '#6baed6' :
+         d > 0  ? '#9ecae1' :
+                  '#f1f1f1';
 }
 
-// ukuran titik
+// STYLE POLYGON
+function style(feature, field){
+  let value = feature.properties[field] || 0;
+
+  return {
+    fillColor: getColor(value),
+    weight: 1,
+    color: "#444",
+    fillOpacity: 0.7
+  };
+}
+
+// UKURAN TITIK
 function getRadius(jumlah){
   return jumlah ? Math.sqrt(jumlah) * 2 : 4;
 }
 
-// load data
+// LOAD DATA
 fetch("DATA BSPS DAN RTLH.geojson")
 .then(res=>res.json())
 .then(data=>{
   dataGeojson = data;
-  tampilkanTitik("2025");
+  updatePeta();
 });
 
-// tampilkan titik
-function tampilkanTitik(tahun){
+function updatePeta(){
+
+  let tahun = document.getElementById("tahun").value;
+  let jenis = document.getElementById("jenis").value;
+
+  let field = jenis + " " + tahun;
 
   if(geojsonLayer) map.removeLayer(geojsonLayer);
+  if(titikLayer) map.removeLayer(titikLayer);
 
+  // ================= POLYGON =================
   geojsonLayer = L.geoJSON(dataGeojson,{
-    pointToLayer:function(feature,latlng){
-
-      let rtlh = feature.properties["RTLH "+tahun] || 0;
-      let bsps = feature.properties["BSPS "+tahun] || 0;
-
-      let jumlah = rtlh + bsps;
-
-      return L.circleMarker(latlng,{
-        radius:getRadius(jumlah),
-        fillColor: rtlh > 0 ? getColor("RTLH") : getColor("BSPS"),
-        color:"#fff",
-        weight:1,
-        fillOpacity:0.8
-      });
+    style: function(feature){
+      return style(feature, field);
     },
 
     onEachFeature:function(feature,layer){
-
-      let rtlh = feature.properties["RTLH "+tahun] || 0;
-      let bsps = feature.properties["BSPS "+tahun] || 0;
-
       layer.bindPopup(
         "<b>Desa:</b> "+feature.properties.DESA+
         "<br><b>Kecamatan:</b> "+feature.properties.KECAMATAN+
         "<hr>"+
-        "<b>RTLH "+tahun+":</b> "+rtlh+
-        "<br><b>BSPS "+tahun+":</b> "+bsps
+        jenis+" "+tahun+" : "+(feature.properties[field] || 0)
       );
     }
-
   }).addTo(map);
+
+  map.fitBounds(geojsonLayer.getBounds());
+
+  // ================= TITIK TENGAH =================
+  titikLayer = L.geoJSON(dataGeojson,{
+    pointToLayer:function(feature,latlng){},
+
+    onEachFeature:function(feature,layer){
+      let jumlah = feature.properties[field] || 0;
+
+      let center = layer.getBounds().getCenter();
+
+      L.circleMarker(center,{
+        radius:getRadius(jumlah),
+        fillColor: jenis === "RTLH" ? "green" : "blue",
+        color:"#fff",
+        weight:1,
+        fillOpacity:0.9
+      })
+      .bindTooltip(jumlah.toString(),{permanent:true, direction:"center"})
+      .addTo(map);
+    }
+  });
 }
 
-// filter tahun
-document.getElementById("tahun").addEventListener("change",function(){
-  tampilkanTitik(this.value);
-});
+// FILTER
+document.getElementById("tahun").addEventListener("change",updatePeta);
+document.getElementById("jenis").addEventListener("change",updatePeta);
+
 </script>
 
 </body>
