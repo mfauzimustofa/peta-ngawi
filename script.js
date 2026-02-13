@@ -69,7 +69,7 @@ BSPS ${thn} : <b>${f.properties["BSPS "+thn]||0}</b>
 `;
 }
 
-/* LABEL */
+/* LABEL ANGKA */
 function updateLabel(){
 
 if(labelLayer) map.removeLayer(labelLayer);
@@ -141,7 +141,6 @@ updateLabel();
 }).addTo(map);
 
 map.fitBounds(geoLayer.getBounds());
-
 updateLabel();
 
 });
