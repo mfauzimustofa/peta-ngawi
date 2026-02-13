@@ -6,45 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<link rel="stylesheet" href="style.css"/>
+
+<style>
+html, body{
+  height:100%;
+  margin:0;
+}
+
+#map{
+  height:100vh;
+}
+</style>
 </head>
 <body>
 
 <div id="map"></div>
-
-<!-- LOGO -->
-<div class="logo-box">
-  <img src="logo-ngawi.png">
-  <div>
-    <b>WEBGIS RTLH & BSPS</b><br>
-    Kabupaten Ngawi
-  </div>
-</div>
-
-<!-- PANEL -->
-<div class="topbar">
-
-  <div class="filter-row">
-    <select id="jenis">
-      <option value="RTLH">RTLH</option>
-      <option value="BSPS">BSPS</option>
-    </select>
-
-    <select id="filterKecamatan">
-      <option value="">Pilih Kecamatan</option>
-    </select>
-
-    <select id="filterDesa">
-      <option value="">Pilih Desa</option>
-    </select>
-  </div>
-
-  <div class="slider-row">
-    <span id="labelTahun">2025</span>
-    <input type="range" id="tahun" min="2021" max="2025" value="2025">
-  </div>
-
-</div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -58,18 +34,27 @@ document.addEventListener("DOMContentLoaded", function(){
     {attribution:'© OpenStreetMap'}
   ).addTo(map);
 
-  // LOAD GEOJSON (WAJIB RELATIVE PATH)
-  fetch("./data-ngawi.geojson")
-    .then(res => res.json())
+  fetch("./data-bsps-rtlh.geojson")
+    .then(res => {
+      if(!res.ok){
+        throw new Error("GeoJSON tidak ditemukan");
+      }
+      return res.json();
+    })
     .then(data => {
-      L.geoJSON(data,{
+
+      const layer = L.geoJSON(data,{
         style:{
           color:"#444",
           weight:1,
           fillOpacity:0.6
         }
       }).addTo(map);
-    });
+
+      map.fitBounds(layer.getBounds());
+
+    })
+    .catch(err => console.error(err));
 
 });
 </script>
