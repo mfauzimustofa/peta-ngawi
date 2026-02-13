@@ -48,7 +48,7 @@ highlighted=[];
 
 function highlight(layer){
 layer.setStyle({
-color:"yellow",
+color:"red",
 weight:3,
 dashArray:"6,6"
 });
@@ -85,18 +85,30 @@ geoLayer.eachLayer(l=>{
 let center=l.getBounds().getCenter();
 let jumlah=l.feature.properties[field]||0;
 
+let kecamatan = "Kecamatan " + l.feature.properties.KECAMATAN;
+
 labelLayer.addLayer(
-L.marker(center,{
-pane:"labels",
-interactive:false,
-icon:L.divIcon({
-className:"label-jumlah",
-html:jumlah
-})
-})
+  L.marker(center, {
+    pane: "labels",
+    interactive: false,
+    icon: L.divIcon({
+      className: "label-jumlah",
+      html: jumlah
+    })
+  })
 );
 
-});
+// Tambah label kecamatan
+labelLayer.addLayer(
+  L.marker(center, {
+    pane: "labels",
+    interactive: false,
+    icon: L.divIcon({
+      className: "label-jumlah",
+      html: kecamatan
+    })
+  })
+);
 
 labelLayer.addTo(map);
 }
