@@ -37,9 +37,17 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-var map = L.map('map').setView([-7.4,111.4],11);
+document.addEventListener("DOMContentLoaded", function(){
+
+const map = L.map('map').setView([-7.4,111.4],11);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+const tahunSlider = document.getElementById("tahun");
+const labelTahun = document.getElementById("labelTahun");
+const jenisSelect = document.getElementById("jenis");
+const filterKecamatan = document.getElementById("filterKecamatan");
+const filterDesa = document.getElementById("filterDesa");
 
 let dataGeojson;
 let batasLayer;
@@ -58,9 +66,7 @@ function getColor(d){
 }
 
 function styleBatas(feature){
-  let tahun = tahunSlider.value;
-  let jenis = jenisSelect.value;
-  let field = jenis+" "+tahun;
+  let field = jenisSelect.value+" "+tahunSlider.value;
   let value = feature.properties[field] || 0;
 
   return {
@@ -74,6 +80,7 @@ function styleBatas(feature){
 fetch("DATA BSPS DAN RTLH.geojson")
 .then(res=>res.json())
 .then(data=>{
+
   dataGeojson = data;
 
   isiDropdown();
@@ -105,9 +112,7 @@ function isiDropdown(){
     dataDesaPerKecamatan[kec].push(desa);
   });
 
-  kecamatan = Array.from(kecamatan).sort();
-
-  kecamatan.forEach(k=>{
+  Array.from(kecamatan).sort().forEach(k=>{
     filterKecamatan.innerHTML += `<option value="${k}">${k}</option>`;
   });
 }
@@ -141,8 +146,8 @@ function onEachFeature(feature,layer){
 }
 
 function getRadius(jumlah){
-  let r = Math.sqrt(jumlah) * 2;
-  return isMobile() ? r * 0.7 : r;
+  let r = Math.sqrt(jumlah)*2;
+  return isMobile()? r*0.7 : r;
 }
 
 function agregasiKecamatan(field){
@@ -150,6 +155,7 @@ function agregasiKecamatan(field){
   let hasil={};
 
   dataGeojson.features.forEach(f=>{
+
     let kec = f.properties.KECAMATAN;
     let jumlah = f.properties[field] || 0;
 
@@ -168,10 +174,10 @@ function agregasiKecamatan(field){
 
 function updateTitik(){
 
-  let tahun = tahunSlider.value;
-  let jenis = jenisSelect.value;
-  let field = jenis+" "+tahun;
-  let warna = jenis === "RTLH" ? "green" : "blue";
+  if(!dataGeojson) return;
+
+  let field = jenisSelect.value+" "+tahunSlider.value;
+  let warna = jenisSelect.value === "RTLH" ? "green" : "blue";
 
   if(titikLayer) map.removeLayer(titikLayer);
 
@@ -266,13 +272,9 @@ filterDesa.onchange = function(){
 
 map.on("zoomend",updateTitik);
 
-const tahunSlider = document.getElementById("tahun");
-const labelTahun = document.getElementById("labelTahun");
-const jenisSelect = document.getElementById("jenis");
-const filterKecamatan = document.getElementById("filterKecamatan");
-const filterDesa = document.getElementById("filterDesa");
-
 labelTahun.innerHTML = tahunSlider.value;
+
+});
 </script>
 
 </body>
