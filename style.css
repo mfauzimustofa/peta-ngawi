@@ -14,17 +14,13 @@ html, body{
   top:15px;
   left:60px;
   z-index:1000;
-
   background:rgba(255,255,255,0.95);
   padding:10px 14px;
   border-radius:8px;
-
   box-shadow:0 3px 10px rgba(0,0,0,0.25);
-
   display:flex;
   gap:8px;
   flex-wrap:wrap;
-  backdrop-filter:blur(4px);
 }
 
 .topbar select{
@@ -32,8 +28,6 @@ html, body{
   border-radius:6px;
   border:1px solid #ccc;
   font-size:13px;
-  cursor:pointer;
-  max-width:160px;
 }
 
 .slider-container{
@@ -45,40 +39,4 @@ html, body{
 
 #tahun{
   width:140px;
-}
-
-.leaflet-popup-content{
-  font-size:13px;
-  line-height:1.5;
-}
-
-.leaflet-tooltip{
-  background:transparent;
-  border:none;
-  box-shadow:none;
-  font-weight:bold;
-  font-size:12px;
-}
-
-.leaflet-tooltip:before{
-  display:none;
-}
-
-@media (max-width:768px){
-
-  .topbar{
-    left:10px;
-    top:10px;
-    padding:6px 8px;
-  }
-
-  .topbar select{
-    font-size:11px;
-    padding:4px 6px;
-    max-width:130px;
-  }
-
-  #tahun{
-    width:120px;
-  }
 }
