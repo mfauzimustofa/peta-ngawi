@@ -34,31 +34,72 @@ var map = L.map('map').setView([-7.4,111.4],11);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 let dataGeojson;
-let layerDesa;
-let layerKecamatan;
+let batasLayer;
+let titikLayer;
+
+// ================= CHOROPLETH =================
+function getColor(d){
+  return d > 50 ? '#084594' :
+         d > 30 ? '#2171b5' :
+         d > 20 ? '#4292c6' :
+         d > 10 ? '#6baed6' :
+         d > 0  ? '#9ecae1' :
+                  '#f1f1f1';
+}
 
 // ================= LOAD DATA =================
 fetch("DATA BSPS DAN RTLH.geojson")
 .then(res=>res.json())
 .then(data=>{
   dataGeojson = data;
-  updatePeta();
+
+  // BATAS ADMINISTRASI SELALU ADA
+  batasLayer = L.geoJSON(dataGeojson,{
+    style:styleBatas,
+    onEachFeature:onEachFeature
+  }).addTo(map);
+
+  map.fitBounds(batasLayer.getBounds());
+
+  updateTitik();
 });
+
+// ================= STYLE POLYGON =================
+function styleBatas(feature){
+
+  let tahun = document.getElementById("tahun").value;
+  let jenis = document.getElementById("jenis").value;
+  let field = jenis+" "+tahun;
+
+  let value = feature.properties[field] || 0;
+
+  return {
+    fillColor:getColor(value),
+    weight:1,
+    color:"#444",
+    fillOpacity:0.7
+  };
+}
+
+// ================= POPUP =================
+function onEachFeature(feature,layer){
+  layer.bindPopup(
+    "<b>Desa:</b> "+feature.properties.DESA+
+    "<br><b>Kecamatan:</b> "+feature.properties.KECAMATAN
+  );
+}
 
 // ================= AGREGASI KECAMATAN =================
 function agregasiKecamatan(field){
 
-  let hasil = {};
+  let hasil={};
 
   dataGeojson.features.forEach(f=>{
     let kec = f.properties.KECAMATAN;
     let jumlah = f.properties[field] || 0;
 
     if(!hasil[kec]){
-      hasil[kec] = {
-        total:0,
-        coords:[]
-      };
+      hasil[kec]={total:0, coords:[]};
     }
 
     hasil[kec].total += jumlah;
@@ -70,61 +111,8 @@ function agregasiKecamatan(field){
   return hasil;
 }
 
-// ================= TITIK DESA =================
-function buatLayerDesa(field, warna){
-
-  return L.geoJSON(dataGeojson,{
-    onEachFeature:function(feature,layer){
-
-      let jumlah = feature.properties[field] || 0;
-      let center = layer.getBounds().getCenter();
-
-      L.circleMarker(center,{
-        radius: Math.sqrt(jumlah)*2,
-        fillColor: warna,
-        color:"#fff",
-        weight:1,
-        fillOpacity:0.9
-      })
-      .bindTooltip(jumlah.toString(),{permanent:true, direction:"center"})
-      .addTo(map);
-
-    }
-  });
-}
-
-// ================= TITIK KECAMATAN =================
-function buatLayerKecamatan(field, warna){
-
-  let dataKec = agregasiKecamatan(field);
-
-  let group = L.layerGroup();
-
-  for(let kec in dataKec){
-
-    let item = dataKec[kec];
-
-    // cari titik tengah kecamatan
-    let lat = item.coords.reduce((a,b)=>a+b.lat,0)/item.coords.length;
-    let lng = item.coords.reduce((a,b)=>a+b.lng,0)/item.coords.length;
-
-    let marker = L.circleMarker([lat,lng],{
-      radius: Math.sqrt(item.total)*2,
-      fillColor: warna,
-      color:"#fff",
-      weight:1,
-      fillOpacity:0.9
-    })
-    .bindTooltip(kec+"<br>"+item.total,{permanent:true, direction:"center"});
-
-    group.addLayer(marker);
-  }
-
-  return group;
-}
-
-// ================= UPDATE =================
-function updatePeta(){
+// ================= UPDATE TITIK =================
+function updateTitik(){
 
   let tahun = document.getElementById("tahun").value;
   let jenis = document.getElementById("jenis").value;
@@ -132,23 +120,68 @@ function updatePeta(){
   let field = jenis+" "+tahun;
   let warna = jenis === "RTLH" ? "green" : "blue";
 
-  if(layerDesa) map.removeLayer(layerDesa);
-  if(layerKecamatan) map.removeLayer(layerKecamatan);
+  if(titikLayer) map.removeLayer(titikLayer);
 
-  if(map.getZoom() >= 13){
-    layerDesa = buatLayerDesa(field,warna);
-    map.addLayer(layerDesa);
-  }else{
-    layerKecamatan = buatLayerKecamatan(field,warna);
-    map.addLayer(layerKecamatan);
+  titikLayer = L.layerGroup();
+
+  // ZOOM JAUH → KECAMATAN
+  if(map.getZoom() < 13){
+
+    let dataKec = agregasiKecamatan(field);
+
+    for(let kec in dataKec){
+
+      let item = dataKec[kec];
+
+      let lat = item.coords.reduce((a,b)=>a+b.lat,0)/item.coords.length;
+      let lng = item.coords.reduce((a,b)=>a+b.lng,0)/item.coords.length;
+
+      L.circleMarker([lat,lng],{
+        radius:Math.sqrt(item.total)*2,
+        fillColor:warna,
+        color:"#fff",
+        weight:1,
+        fillOpacity:0.9
+      })
+      .bindTooltip(kec+"<br>"+item.total,{permanent:true})
+      .addTo(titikLayer);
+    }
+
   }
+  else{
+
+    // ZOOM DEKAT → DESA
+    dataGeojson.features.forEach(f=>{
+
+      let jumlah = f.properties[field] || 0;
+
+      let center = L.geoJSON(f).getBounds().getCenter();
+
+      L.circleMarker(center,{
+        radius:Math.sqrt(jumlah)*2,
+        fillColor:warna,
+        color:"#fff",
+        weight:1,
+        fillOpacity:0.9
+      })
+      .bindTooltip(jumlah.toString(),{permanent:true})
+      .addTo(titikLayer);
+
+    });
+
+  }
+
+  titikLayer.addTo(map);
+
+  // UPDATE WARNA POLYGON
+  batasLayer.setStyle(styleBatas);
 }
 
 // ================= EVENT =================
-map.on("zoomend",updatePeta);
-document.getElementById("tahun").addEventListener("change",updatePeta);
-document.getElementById("jenis").addEventListener("change",updatePeta);
-</script>
+map.on("zoomend",updateTitik);
+document.getElementById("tahun").addEventListener("change",updateTitik);
+document.getElementById("jenis").addEventListener("change",updateTitik);
 
+</script>
 </body>
 </html>
