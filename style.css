@@ -9,7 +9,6 @@ html, body{
   width:100%;
 }
 
-/* TOPBAR */
 .topbar{
   position:absolute;
   top:15px;
@@ -37,7 +36,6 @@ html, body{
   max-width:160px;
 }
 
-/* SLIDER */
 .slider-container{
   display:flex;
   flex-direction:column;
@@ -49,22 +47,15 @@ html, body{
   width:140px;
 }
 
-/* POPUP */
 .leaflet-popup-content{
   font-size:13px;
   line-height:1.5;
 }
 
-.leaflet-popup-content b{
-  color:#2c3e50;
-}
-
-/* TOOLTIP ANGKA */
 .leaflet-tooltip{
   background:transparent;
   border:none;
   box-shadow:none;
-  color:#000;
   font-weight:bold;
   font-size:12px;
 }
@@ -73,7 +64,6 @@ html, body{
   display:none;
 }
 
-/* MOBILE */
 @media (max-width:768px){
 
   .topbar{
@@ -90,9 +80,5 @@ html, body{
 
   #tahun{
     width:120px;
-  }
-
-  .leaflet-tooltip{
-    font-size:11px;
   }
 }
