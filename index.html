@@ -31,9 +31,7 @@
 <script>
 var map = L.map('map').setView([-7.4,111.4],11);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'© OpenStreetMap'
-}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 let dataGeojson;
 let batasLayer;
@@ -72,13 +70,41 @@ fetch("DATA BSPS DAN RTLH.geojson")
   dataGeojson = data;
 
   batasLayer = L.geoJSON(dataGeojson,{
-    style:styleBatas
+    style:styleBatas,
+    onEachFeature:onEachFeature
   }).addTo(map);
 
   map.fitBounds(batasLayer.getBounds());
-
   updateTitik();
 });
+
+function onEachFeature(feature,layer){
+
+  layer.on("click", function(){
+
+    let tahun = document.getElementById("tahun").value;
+
+    let rtlh = feature.properties["RTLH "+tahun] || 0;
+    let bsps = feature.properties["BSPS "+tahun] || 0;
+
+    batasLayer.resetStyle();
+
+    layer.setStyle({
+      weight:2,
+      color:"#000",
+      fillOpacity:0.9
+    });
+
+    layer.bindPopup(
+      "<b>Desa :</b> "+feature.properties.DESA+
+      "<br><b>Kecamatan :</b> "+feature.properties.KECAMATAN+
+      "<hr>"+
+      "<b>RTLH "+tahun+" :</b> "+rtlh+
+      "<br><b>BSPS "+tahun+" :</b> "+bsps
+    ).openPopup();
+
+  });
+}
 
 function getRadius(jumlah){
   let r = Math.sqrt(jumlah) * 2;
@@ -119,7 +145,6 @@ function updateTitik(){
 
   let zoomBatas = isMobile() ? 14 : 13;
 
-  // ================= KECAMATAN =================
   if(map.getZoom() < zoomBatas){
 
     let dataKec = agregasiKecamatan(field);
@@ -146,10 +171,8 @@ function updateTitik(){
       titikLayer.addLayer(marker);
     }
 
-  }
-  else{
+  } else {
 
-    // ================= DESA =================
     dataGeojson.features.forEach(f=>{
 
       let jumlah = f.properties[field] || 0;
@@ -171,11 +194,11 @@ function updateTitik(){
       }
 
       titikLayer.addLayer(marker);
+
     });
   }
 
   titikLayer.addTo(map);
-
   batasLayer.setStyle(styleBatas);
 }
 
