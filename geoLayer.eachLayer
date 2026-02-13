@@ -69,7 +69,7 @@ BSPS ${thn} : <b>${f.properties["BSPS "+thn]||0}</b>
 `;
 }
 
-/* LABEL ANGKA */
+/* LABEL ANGKA + NAMA KECAMATAN */
 function updateLabel(){
 
 if(labelLayer) map.removeLayer(labelLayer);
@@ -84,19 +84,33 @@ geoLayer.eachLayer(l=>{
 
 let center=l.getBounds().getCenter();
 let jumlah=l.feature.properties[field]||0;
+let kecamatan="Kecamatan "+l.feature.properties.KECAMATAN;
 
-// Tambah label kecamatan
-let kecamatan = "Kecamatan " + l.feature.properties.KECAMATAN;
+/* LABEL ANGKA */
 labelLayer.addLayer(
-  L.marker(center, {
-    pane: "labels",
-    interactive: false,
-    icon: L.divIcon({
-      className: "label-jumlah",
-      html: kecamatan
-    })
-  })
+L.marker(center,{
+pane:"labels",
+interactive:false,
+icon:L.divIcon({
+className:"label-jumlah",
+html:jumlah
+})
+})
 );
+
+/* LABEL KECAMATAN */
+labelLayer.addLayer(
+L.marker(center,{
+pane:"labels",
+interactive:false,
+icon:L.divIcon({
+className:"label-jumlah",
+html:kecamatan
+})
+})
+);
+
+});
 
 labelLayer.addTo(map);
 }
