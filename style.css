@@ -8,7 +8,6 @@ html, body{
   width:100%;
 }
 
-/* FILTER TAHUN */
 .topbar{
   position:absolute;
   top:10px;
@@ -22,5 +21,5 @@ html, body{
 
 select{
   padding:5px;
-  font-size:14px;
+  margin-right:5px;
 }
