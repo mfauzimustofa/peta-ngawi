@@ -11,17 +11,25 @@
 <body>
 
 <div class="topbar">
-  <select id="tahun">
-    <option value="2021">2021</option>
-    <option value="2022">2022</option>
-    <option value="2024">2024</option>
-    <option value="2025" selected>2025</option>
-  </select>
+
+  <div class="slider-container">
+    <span id="labelTahun">2025</span>
+    <input type="range" id="tahun" min="2021" max="2025" step="1" value="2025">
+  </div>
 
   <select id="jenis">
     <option value="RTLH">RTLH</option>
     <option value="BSPS">BSPS</option>
   </select>
+
+  <select id="filterKecamatan">
+    <option value="">Pilih Kecamatan</option>
+  </select>
+
+  <select id="filterDesa">
+    <option value="">Pilih Desa</option>
+  </select>
+
 </div>
 
 <div id="map"></div>
@@ -69,6 +77,8 @@ fetch("DATA BSPS DAN RTLH.geojson")
 .then(data=>{
   dataGeojson = data;
 
+  isiDropdown();
+
   batasLayer = L.geoJSON(dataGeojson,{
     style:styleBatas,
     onEachFeature:onEachFeature
@@ -77,6 +87,28 @@ fetch("DATA BSPS DAN RTLH.geojson")
   map.fitBounds(batasLayer.getBounds());
   updateTitik();
 });
+
+function isiDropdown(){
+
+  let kecamatan = new Set();
+  let desa = new Set();
+
+  dataGeojson.features.forEach(f=>{
+    kecamatan.add(f.properties.KECAMATAN);
+    desa.add(f.properties.DESA);
+  });
+
+  kecamatan = Array.from(kecamatan).sort();
+  desa = Array.from(desa).sort();
+
+  kecamatan.forEach(k=>{
+    filterKecamatan.innerHTML += `<option value="${k}">${k}</option>`;
+  });
+
+  desa.forEach(d=>{
+    filterDesa.innerHTML += `<option value="${d}">${d}</option>`;
+  });
+}
 
 function onEachFeature(feature,layer){
 
@@ -202,9 +234,36 @@ function updateTitik(){
   batasLayer.setStyle(styleBatas);
 }
 
+tahun.addEventListener("input",()=>{
+  labelTahun.innerHTML = tahun.value;
+  updateTitik();
+  batasLayer.setStyle(styleBatas);
+});
+
+jenis.addEventListener("change",updateTitik);
+
+filterKecamatan.addEventListener("change", function(){
+
+  batasLayer.eachLayer(layer=>{
+    if(layer.feature.properties.KECAMATAN === this.value){
+      map.fitBounds(layer.getBounds());
+    }
+  });
+
+});
+
+filterDesa.addEventListener("change", function(){
+
+  batasLayer.eachLayer(layer=>{
+    if(layer.feature.properties.DESA === this.value){
+      map.fitBounds(layer.getBounds());
+      layer.fire("click");
+    }
+  });
+
+});
+
 map.on("zoomend",updateTitik);
-document.getElementById("tahun").addEventListener("change",updateTitik);
-document.getElementById("jenis").addEventListener("change",updateTitik);
 </script>
 
 </body>
