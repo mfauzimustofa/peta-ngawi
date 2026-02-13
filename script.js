@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function(){
 
 const map = L.map('map').setView([-7.4,111.4],11);
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 const jenis = document.getElementById("jenis");
@@ -37,7 +38,7 @@ fillOpacity:0.7
 function highlightLayer(layer){
 if(selectedLayer){geoLayer.resetStyle(selectedLayer);}
 layer.setStyle({color:"yellow",weight:3,dashArray:"6,6"});
-selectedLayer = layer;
+selectedLayer=layer;
 }
 
 function updateInfo(){
@@ -47,12 +48,12 @@ let jns = jenis.value;
 
 if(jns==="RTLH"){
 if(thn==="2023"){
-infoProgram.innerHTML="<b>RTLH 2023</b><br>Dinas Pemberdayaan Masyarakat dan Desa Kabupaten Ngawi";
+infoProgram.innerHTML="<b>RTLH 2023</b><br>Dinas Pemberdayaan Masyarakat dan Desa Kabupaten Ngawi<br><i>Sumber Dana: Dana Desa</i>";
 }else{
 infoProgram.innerHTML="<b>RTLH "+thn+"</b><br>Dinas Perumahan Rakyat dan Kawasan Permukiman Kabupaten Ngawi";
 }
 }else{
-infoProgram.innerHTML="<b>BSPS "+thn+"</b><br>BP3KP Jawa IV<br>Kementerian PKP";
+infoProgram.innerHTML="<b>BSPS "+thn+"</b><br>Balai Pelaksana Penyediaan Perumahan dan Kawasan Permukiman Jawa IV<br>Kementerian PKP";
 }
 }
 
@@ -114,6 +115,7 @@ map.fitBounds(layer.getBounds());
 }).addTo(map);
 
 map.fitBounds(geoLayer.getBounds());
+
 updateTitik();
 updateInfo();
 
