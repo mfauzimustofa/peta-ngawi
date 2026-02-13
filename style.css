@@ -1,93 +1,97 @@
 html, body{
-  height:100%;
-  margin:0;
-  font-family:Segoe UI, sans-serif;
+height:100%;
+margin:0;
+font-family:Segoe UI, sans-serif;
 }
 
 #map{
-  height:100vh;
-  width:100%;
+height:100vh;
 }
 
 /* LOGO */
 .logo-box{
-  position:absolute;
-  top:15px;
-  left:15px;
-  z-index:1000;
-
-  display:flex;
-  align-items:center;
-  gap:8px;
-
-  background:white;
-  padding:6px 10px;
-  border-radius:10px;
-
-  box-shadow:0 3px 10px rgba(0,0,0,0.25);
+position:absolute;
+top:15px;
+left:15px;
+z-index:1000;
+display:flex;
+align-items:center;
+gap:8px;
+background:white;
+padding:6px 10px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.25);
 }
 
 .logo-box img{
-  height:38px;
+height:38px;
 }
 
 /* PANEL */
 .topbar{
-  position:absolute;
-  top:15px;
-  left:110px;
-  z-index:1000;
-
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-
-  background:rgba(255,255,255,0.95);
-  padding:12px 14px;
-  border-radius:14px;
-
-  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+position:absolute;
+top:15px;
+left:110px;
+z-index:1000;
+background:white;
+padding:12px 14px;
+border-radius:14px;
+display:flex;
+flex-direction:column;
+gap:10px;
+box-shadow:0 4px 14px rgba(0,0,0,0.25);
 }
 
-/* DROPDOWN */
 .filter-row{
-  display:flex;
-  gap:10px;
+display:flex;
+gap:10px;
 }
 
 .filter-row select{
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  min-width:160px;
-  font-size:13px;
+padding:8px 10px;
+border-radius:8px;
+border:1px solid #ccc;
+min-width:160px;
 }
 
-/* SLIDER */
 .slider-row{
-  display:flex;
-  flex-direction:column;
+display:flex;
+flex-direction:column;
 }
 
 #tahun{
-  width:100%;
+width:100%;
 }
 
-/* TURUNKAN ZOOM */
+.info-program{
+position:absolute;
+bottom:20px;
+left:15px;
+z-index:1000;
+background:white;
+padding:12px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.25);
+max-width:320px;
+font-size:13px;
+line-height:1.5;
+}
+
+/* ZOOM TURUN */
 .leaflet-top.leaflet-left{
-  top:110px;
+top:110px;
 }
 
 /* MOBILE */
-@media (max-width:768px){
+@media(max-width:768px){
 
-  .topbar{
-    left:10px;
-    right:10px;
-  }
+.topbar{
+left:10px;
+right:10px;
+}
 
-  .filter-row{
-    flex-direction:column;
-  }
+.filter-row{
+flex-direction:column;
+}
 
 }
