@@ -44,10 +44,9 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let dataGeojson;
 let batasLayer;
 let titikLayer;
+let dataDesaPerKecamatan = {};
 
-function isMobile(){
-  return window.innerWidth <= 768;
-}
+function isMobile(){ return window.innerWidth <= 768; }
 
 function getColor(d){
   return d > 50 ? '#084594' :
@@ -59,8 +58,8 @@ function getColor(d){
 }
 
 function styleBatas(feature){
-  let tahun = document.getElementById("tahun").value;
-  let jenis = document.getElementById("jenis").value;
+  let tahun = tahunSlider.value;
+  let jenis = jenisSelect.value;
   let field = jenis+" "+tahun;
   let value = feature.properties[field] || 0;
 
@@ -91,22 +90,25 @@ fetch("DATA BSPS DAN RTLH.geojson")
 function isiDropdown(){
 
   let kecamatan = new Set();
-  let desa = new Set();
 
   dataGeojson.features.forEach(f=>{
-    kecamatan.add(f.properties.KECAMATAN);
-    desa.add(f.properties.DESA);
+
+    let kec = f.properties.KECAMATAN;
+    let desa = f.properties.DESA;
+
+    kecamatan.add(kec);
+
+    if(!dataDesaPerKecamatan[kec]){
+      dataDesaPerKecamatan[kec] = [];
+    }
+
+    dataDesaPerKecamatan[kec].push(desa);
   });
 
   kecamatan = Array.from(kecamatan).sort();
-  desa = Array.from(desa).sort();
 
   kecamatan.forEach(k=>{
     filterKecamatan.innerHTML += `<option value="${k}">${k}</option>`;
-  });
-
-  desa.forEach(d=>{
-    filterDesa.innerHTML += `<option value="${d}">${d}</option>`;
   });
 }
 
@@ -114,7 +116,7 @@ function onEachFeature(feature,layer){
 
   layer.on("click", function(){
 
-    let tahun = document.getElementById("tahun").value;
+    let tahun = tahunSlider.value;
 
     let rtlh = feature.properties["RTLH "+tahun] || 0;
     let bsps = feature.properties["BSPS "+tahun] || 0;
@@ -166,8 +168,8 @@ function agregasiKecamatan(field){
 
 function updateTitik(){
 
-  let tahun = document.getElementById("tahun").value;
-  let jenis = document.getElementById("jenis").value;
+  let tahun = tahunSlider.value;
+  let jenis = jenisSelect.value;
   let field = jenis+" "+tahun;
   let warna = jenis === "RTLH" ? "green" : "blue";
 
@@ -175,7 +177,7 @@ function updateTitik(){
 
   titikLayer = L.layerGroup();
 
-  let zoomBatas = isMobile() ? 14 : 13;
+  let zoomBatas = isMobile()?14:13;
 
   if(map.getZoom() < zoomBatas){
 
@@ -188,19 +190,15 @@ function updateTitik(){
       let lat = item.coords.reduce((a,b)=>a+b.lat,0)/item.coords.length;
       let lng = item.coords.reduce((a,b)=>a+b.lng,0)/item.coords.length;
 
-      let marker = L.circleMarker([lat,lng],{
-        radius:getRadius(item.total),
-        fillColor:warna,
-        color:"#fff",
-        weight:1,
-        fillOpacity:0.9
-      });
-
-      if(!isMobile()){
-        marker.bindTooltip(kec+"<br>"+item.total,{permanent:true});
-      }
-
-      titikLayer.addLayer(marker);
+      titikLayer.addLayer(
+        L.circleMarker([lat,lng],{
+          radius:getRadius(item.total),
+          fillColor:warna,
+          color:"#fff",
+          weight:1,
+          fillOpacity:0.9
+        })
+      );
     }
 
   } else {
@@ -210,23 +208,15 @@ function updateTitik(){
       let jumlah = f.properties[field] || 0;
       let center = L.geoJSON(f).getBounds().getCenter();
 
-      let marker = L.circleMarker(center,{
-        radius:getRadius(jumlah),
-        fillColor:warna,
-        color:"#fff",
-        weight:1,
-        fillOpacity:0.9
-      });
-
-      if(map.getZoom() >= (isMobile()?15:13)){
-        marker.bindTooltip(jumlah.toString(),{
-          permanent:true,
-          direction:"center"
-        });
-      }
-
-      titikLayer.addLayer(marker);
-
+      titikLayer.addLayer(
+        L.circleMarker(center,{
+          radius:getRadius(jumlah),
+          fillColor:warna,
+          color:"#fff",
+          weight:1,
+          fillOpacity:0.9
+        })
+      );
     });
   }
 
@@ -234,36 +224,55 @@ function updateTitik(){
   batasLayer.setStyle(styleBatas);
 }
 
-tahun.addEventListener("input",()=>{
-  labelTahun.innerHTML = tahun.value;
+/* ================= EVENT ================= */
+
+tahunSlider.oninput = ()=>{
+  labelTahun.innerHTML = tahunSlider.value;
   updateTitik();
-  batasLayer.setStyle(styleBatas);
-});
+};
 
-jenis.addEventListener("change",updateTitik);
+jenisSelect.onchange = updateTitik;
 
-filterKecamatan.addEventListener("change", function(){
+filterKecamatan.onchange = function(){
+
+  let kec = this.value;
+
+  filterDesa.innerHTML = '<option value="">Pilih Desa</option>';
+
+  if(!kec) return;
+
+  dataDesaPerKecamatan[kec].sort().forEach(d=>{
+    filterDesa.innerHTML += `<option value="${d}">${d}</option>`;
+  });
 
   batasLayer.eachLayer(layer=>{
-    if(layer.feature.properties.KECAMATAN === this.value){
+    if(layer.feature.properties.KECAMATAN === kec){
       map.fitBounds(layer.getBounds());
     }
   });
+};
 
-});
+filterDesa.onchange = function(){
 
-filterDesa.addEventListener("change", function(){
+  let desa = this.value;
 
   batasLayer.eachLayer(layer=>{
-    if(layer.feature.properties.DESA === this.value){
+    if(layer.feature.properties.DESA === desa){
       map.fitBounds(layer.getBounds());
       layer.fire("click");
     }
   });
-
-});
+};
 
 map.on("zoomend",updateTitik);
+
+const tahunSlider = document.getElementById("tahun");
+const labelTahun = document.getElementById("labelTahun");
+const jenisSelect = document.getElementById("jenis");
+const filterKecamatan = document.getElementById("filterKecamatan");
+const filterDesa = document.getElementById("filterDesa");
+
+labelTahun.innerHTML = tahunSlider.value;
 </script>
 
 </body>
