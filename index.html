@@ -33,6 +33,7 @@
 </div>
 
 <div id="map"></div>
+<div class="info-program" id="infoProgram"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -48,6 +49,7 @@ const labelTahun = document.getElementById("labelTahun");
 const jenisSelect = document.getElementById("jenis");
 const filterKecamatan = document.getElementById("filterKecamatan");
 const filterDesa = document.getElementById("filterDesa");
+const infoProgram = document.getElementById("infoProgram");
 
 let dataGeojson;
 let batasLayer;
@@ -91,7 +93,9 @@ fetch("DATA BSPS DAN RTLH.geojson")
   }).addTo(map);
 
   map.fitBounds(batasLayer.getBounds());
+
   updateTitik();
+  updateInfoProgram();
 });
 
 function isiDropdown(){
@@ -230,14 +234,40 @@ function updateTitik(){
   batasLayer.setStyle(styleBatas);
 }
 
-/* ================= EVENT ================= */
+function updateInfoProgram(){
+
+  let tahun = tahunSlider.value;
+  let jenis = jenisSelect.value;
+
+  if(jenis === "RTLH"){
+
+    if(tahun === "2023"){
+      infoProgram.innerHTML =
+        "<b>RTLH "+tahun+"</b><br>DPMD Kabupaten Ngawi (Dana Desa)";
+    }else{
+      infoProgram.innerHTML =
+        "<b>RTLH "+tahun+"</b><br>Dinas Perumahan Rakyat dan Kawasan Permukiman Kabupaten Ngawi";
+    }
+
+  }else{
+
+    infoProgram.innerHTML =
+      "<b>BSPS "+tahun+"</b><br>BP3KP Jawa IV<br>Kementerian PKP";
+  }
+}
+
+/* EVENT */
 
 tahunSlider.oninput = ()=>{
   labelTahun.innerHTML = tahunSlider.value;
   updateTitik();
+  updateInfoProgram();
 };
 
-jenisSelect.onchange = updateTitik;
+jenisSelect.onchange = ()=>{
+  updateTitik();
+  updateInfoProgram();
+};
 
 filterKecamatan.onchange = function(){
 
@@ -253,7 +283,10 @@ filterKecamatan.onchange = function(){
 
   batasLayer.eachLayer(layer=>{
     if(layer.feature.properties.KECAMATAN === kec){
-      map.fitBounds(layer.getBounds());
+
+      let center = layer.getBounds().getCenter();
+      map.flyTo(center,13,{duration:1.2});
+
     }
   });
 };
@@ -264,7 +297,10 @@ filterDesa.onchange = function(){
 
   batasLayer.eachLayer(layer=>{
     if(layer.feature.properties.DESA === desa){
-      map.fitBounds(layer.getBounds());
+
+      let center = layer.getBounds().getCenter();
+      map.flyTo(center,15,{duration:1.2});
+
       layer.fire("click");
     }
   });
