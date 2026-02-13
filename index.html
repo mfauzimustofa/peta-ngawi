@@ -6,55 +6,181 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<style>
-html, body{
-  height:100%;
-  margin:0;
-}
-
-#map{
-  height:100vh;
-}
-</style>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
 <div id="map"></div>
+
+<!-- LOGO -->
+<div class="logo-box">
+  <img src="logo-ngawi.png">
+  <div>
+    <b>WEBGIS RTLH & BSPS</b><br>
+    Kabupaten Ngawi
+  </div>
+</div>
+
+<!-- PANEL -->
+<div class="topbar">
+
+  <div class="filter-row">
+    <select id="jenis">
+      <option value="RTLH">RTLH</option>
+      <option value="BSPS">BSPS</option>
+    </select>
+
+    <select id="filterKecamatan">
+      <option value="">Pilih Kecamatan</option>
+    </select>
+
+    <select id="filterDesa">
+      <option value="">Pilih Desa</option>
+    </select>
+  </div>
+
+  <div class="slider-row">
+    <span id="labelTahun">2025</span>
+    <input type="range" id="tahun" min="2021" max="2025" value="2025">
+  </div>
+
+</div>
+
+<div class="info-program" id="infoProgram"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function(){
 
-  const map = L.map('map').setView([-7.4,111.4],11);
+const map = L.map('map').setView([-7.4,111.4],11);
 
-  L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {attribution:'© OpenStreetMap'}
-  ).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'© OpenStreetMap'
+}).addTo(map);
 
-  fetch("./data-bsps-rtlh.geojson")
-    .then(res => {
-      if(!res.ok){
-        throw new Error("GeoJSON tidak ditemukan");
+map.zoomControl.setPosition('topleft');
+
+const jenis = document.getElementById("jenis");
+const tahun = document.getElementById("tahun");
+const labelTahun = document.getElementById("labelTahun");
+const filterKecamatan = document.getElementById("filterKecamatan");
+const filterDesa = document.getElementById("filterDesa");
+const infoProgram = document.getElementById("infoProgram");
+
+let geoLayer;
+let dataDesaPerKecamatan = {};
+
+function getColor(d){
+  return d > 50 ? '#084594' :
+         d > 30 ? '#2171b5' :
+         d > 20 ? '#4292c6' :
+         d > 10 ? '#6baed6' :
+         d > 0 ? '#9ecae1' :
+         '#f1f1f1';
+}
+
+function style(feature){
+  let field = jenis.value + " " + tahun.value;
+  let value = feature.properties[field] || 0;
+
+  return {
+    fillColor:getColor(value),
+    weight:1,
+    color:"#444",
+    fillOpacity:0.7
+  };
+}
+
+fetch("./data-bsps-rtlh.geojson")
+.then(res=>res.json())
+.then(data=>{
+
+  geoLayer = L.geoJSON(data,{
+    style:style,
+    onEachFeature:(feature,layer)=>{
+
+      let kec = feature.properties.KECAMATAN;
+      let desa = feature.properties.DESA;
+
+      if(!dataDesaPerKecamatan[kec]){
+        dataDesaPerKecamatan[kec]=[];
+        filterKecamatan.innerHTML += `<option value="${kec}">${kec}</option>`;
       }
-      return res.json();
-    })
-    .then(data => {
 
-      const layer = L.geoJSON(data,{
-        style:{
-          color:"#444",
-          weight:1,
-          fillOpacity:0.6
-        }
-      }).addTo(map);
+      dataDesaPerKecamatan[kec].push(desa);
 
+      layer.on("click",()=>{
+        map.fitBounds(layer.getBounds());
+      });
+
+    }
+  }).addTo(map);
+
+  map.fitBounds(geoLayer.getBounds());
+
+});
+
+jenis.onchange = updateStyle;
+tahun.oninput = ()=>{
+  labelTahun.innerHTML = tahun.value;
+  updateStyle();
+  updateInfo();
+};
+
+function updateStyle(){
+  geoLayer.setStyle(style);
+}
+
+filterKecamatan.onchange = function(){
+
+  filterDesa.innerHTML = '<option value="">Pilih Desa</option>';
+
+  dataDesaPerKecamatan[this.value]
+  .forEach(d=>filterDesa.innerHTML+=`<option>${d}</option>`);
+
+};
+
+filterDesa.onchange = function(){
+
+  geoLayer.eachLayer(layer=>{
+    if(layer.feature.properties.DESA === this.value){
       map.fitBounds(layer.getBounds());
+    }
+  });
 
-    })
-    .catch(err => console.error(err));
+};
+
+function updateInfo(){
+
+if(jenis.value==="RTLH"){
+
+if(tahun.value==="2023"){
+
+infoProgram.innerHTML =
+"<b>Program RTLH "+tahun.value+"</b><br>" +
+"Dinas Pemberdayaan Masyarakat dan Desa Kabupaten Ngawi melalui Dana Desa";
+
+}else{
+
+infoProgram.innerHTML =
+"<b>Program RTLH "+tahun.value+"</b><br>" +
+"Dinas Perumahan Rakyat dan Kawasan Permukiman Kabupaten Ngawi";
+
+}
+
+}else{
+
+infoProgram.innerHTML =
+"<b>Program BSPS "+tahun.value+"</b><br>" +
+"Balai Pelaksana Penyediaan Perumahan dan Kawasan Permukiman Jawa IV<br>" +
+"Kementerian Perumahan dan Kawasan Permukiman";
+
+}
+
+}
+
+updateInfo();
 
 });
 </script>
