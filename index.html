@@ -1,50 +1,25 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"/>
-  <title>WebGIS RTLH Kabupaten Ngawi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <title>WebGIS RTLH Ngawi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<header class="navbar">
-  <div class="logo">WEBGIS RTLH NGAWI</div>
-  <nav>
-    <a href="#">Beranda</a>
-    <a href="#">Peta</a>
-    <a href="#">Data</a>
-    <a href="#">Tentang</a>
-  </nav>
-</header>
+<div class="topbar">
+  <select id="tahun">
+    <option value="2021">2021</option>
+    <option value="2022">2022</option>
+    <option value="2024">2024</option>
+    <option value="2025" selected>2025</option>
+  </select>
+</div>
 
-<!-- STATISTIK -->
-<section class="cards">
-  <div class="card">
-    <h2>3.654</h2>
-    <p>Jumlah Tersurvei</p>
-  </div>
-
-  <div class="card">
-    <h2>280</h2>
-    <p>Jumlah RTLH</p>
-  </div>
-
-  <div class="card">
-    <h2>282</h2>
-    <p>Siap Huni</p>
-  </div>
-</section>
-
-<!-- MAP -->
-<section class="map-section">
-  <div class="map-card">
-    <div id="map"></div>
-  </div>
-</section>
+<div id="map"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -52,19 +27,72 @@
 var map = L.map('map').setView([-7.4,111.4],11);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'&copy; OpenStreetMap'
+  attribution:'© OpenStreetMap'
 }).addTo(map);
 
+let geojsonLayer;
+let dataGeojson;
+
+// ambil warna
+function getColor(jenis){
+  return jenis === "RTLH" ? "red" : "blue";
+}
+
+// ukuran titik
+function getRadius(jumlah){
+  return jumlah ? Math.sqrt(jumlah) * 2 : 4;
+}
+
+// load data
 fetch("DATA BSPS DAN RTLH.geojson")
 .then(res=>res.json())
 .then(data=>{
-  var geojson = L.geoJSON(data,{
-    onEachFeature:function(feature,layer){
-      layer.bindPopup("<b>Desa :</b> "+feature.properties.DESA);
-    }
-  }).addTo(map);
+  dataGeojson = data;
+  tampilkanTitik("2025");
+});
 
-  map.fitBounds(geojson.getBounds());
+// tampilkan titik
+function tampilkanTitik(tahun){
+
+  if(geojsonLayer) map.removeLayer(geojsonLayer);
+
+  geojsonLayer = L.geoJSON(dataGeojson,{
+    pointToLayer:function(feature,latlng){
+
+      let rtlh = feature.properties["RTLH "+tahun] || 0;
+      let bsps = feature.properties["BSPS "+tahun] || 0;
+
+      let jumlah = rtlh + bsps;
+
+      return L.circleMarker(latlng,{
+        radius:getRadius(jumlah),
+        fillColor: rtlh > 0 ? getColor("RTLH") : getColor("BSPS"),
+        color:"#fff",
+        weight:1,
+        fillOpacity:0.8
+      });
+    },
+
+    onEachFeature:function(feature,layer){
+
+      let rtlh = feature.properties["RTLH "+tahun] || 0;
+      let bsps = feature.properties["BSPS "+tahun] || 0;
+
+      layer.bindPopup(
+        "<b>Desa:</b> "+feature.properties.DESA+
+        "<br><b>Kecamatan:</b> "+feature.properties.KECAMATAN+
+        "<hr>"+
+        "<b>RTLH "+tahun+":</b> "+rtlh+
+        "<br><b>BSPS "+tahun+":</b> "+bsps
+      );
+    }
+
+  }).addTo(map);
+}
+
+// filter tahun
+document.getElementById("tahun").addEventListener("change",function(){
+  tampilkanTitik(this.value);
 });
 </script>
 
