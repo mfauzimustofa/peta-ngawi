@@ -9,15 +9,19 @@ html, body{
   width:100%;
 }
 
+/* TOPBAR */
 .topbar{
   position:absolute;
   top:15px;
   left:60px;
   z-index:1000;
+
   background:rgba(255,255,255,0.95);
   padding:10px 14px;
   border-radius:8px;
+
   box-shadow:0 3px 10px rgba(0,0,0,0.25);
+
   display:flex;
   gap:8px;
   flex-wrap:wrap;
@@ -39,4 +43,43 @@ html, body{
 
 #tahun{
   width:140px;
+}
+
+/* INFO PROGRAM */
+.info-program{
+  position:absolute;
+  bottom:20px;
+  left:60px;
+  z-index:1000;
+
+  background:rgba(255,255,255,0.95);
+  padding:12px 14px;
+  border-radius:8px;
+
+  box-shadow:0 3px 10px rgba(0,0,0,0.25);
+
+  font-size:13px;
+  max-width:260px;
+  line-height:1.5;
+}
+
+/* MOBILE */
+@media (max-width:768px){
+
+  .topbar{
+    left:10px;
+    top:10px;
+    padding:6px 8px;
+  }
+
+  .info-program{
+    left:10px;
+    bottom:15px;
+    max-width:220px;
+    font-size:12px;
+  }
+
+  #tahun{
+    width:120px;
+  }
 }
