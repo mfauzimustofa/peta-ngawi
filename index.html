@@ -12,7 +12,7 @@
 
 <div id="map"></div>
 
-<!-- PANEL FILTER -->
+<!-- PANEL -->
 <div class="topbar">
 
   <div class="filter-row">
@@ -37,7 +37,7 @@
 
 </div>
 
-<!-- LOGO KANAN ATAS -->
+<!-- LOGO -->
 <div class="logo-box">
   <img src="logo-ngawi.png">
   <div class="logo-text">
@@ -49,7 +49,8 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-// MAP
+document.addEventListener("DOMContentLoaded", function(){
+
 const map = L.map('map').setView([-7.4,111.4],11);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
@@ -57,6 +58,26 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 }).addTo(map);
 
 map.zoomControl.setPosition('topleft');
+
+/* ================= LOAD GEOJSON ================= */
+
+fetch("./data-bsps-rtlh.geojson")
+.then(res => res.json())
+.then(data => {
+
+  const layer = L.geoJSON(data,{
+    style:{
+      color:"#444",
+      weight:1,
+      fillOpacity:0.6
+    }
+  }).addTo(map);
+
+  map.fitBounds(layer.getBounds());
+
+});
+
+});
 </script>
 
 </body>
