@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
-<title>WebGIS RTLH & BSPS</title>
+<title>WebGIS RTLH & BSPS Ngawi</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
@@ -31,13 +31,18 @@
 <script>
 var map = L.map('map').setView([-7.4,111.4],11);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'© OpenStreetMap'
+}).addTo(map);
 
 let dataGeojson;
 let batasLayer;
 let titikLayer;
 
-// ================= CHOROPLETH =================
+function isMobile(){
+  return window.innerWidth <= 768;
+}
+
 function getColor(d){
   return d > 50 ? '#084594' :
          d > 30 ? '#2171b5' :
@@ -47,30 +52,10 @@ function getColor(d){
                   '#f1f1f1';
 }
 
-// ================= LOAD DATA =================
-fetch("DATA BSPS DAN RTLH.geojson")
-.then(res=>res.json())
-.then(data=>{
-  dataGeojson = data;
-
-  // BATAS ADMINISTRASI SELALU ADA
-  batasLayer = L.geoJSON(dataGeojson,{
-    style:styleBatas,
-    onEachFeature:onEachFeature
-  }).addTo(map);
-
-  map.fitBounds(batasLayer.getBounds());
-
-  updateTitik();
-});
-
-// ================= STYLE POLYGON =================
 function styleBatas(feature){
-
   let tahun = document.getElementById("tahun").value;
   let jenis = document.getElementById("jenis").value;
   let field = jenis+" "+tahun;
-
   let value = feature.properties[field] || 0;
 
   return {
@@ -81,15 +66,25 @@ function styleBatas(feature){
   };
 }
 
-// ================= POPUP =================
-function onEachFeature(feature,layer){
-  layer.bindPopup(
-    "<b>Desa:</b> "+feature.properties.DESA+
-    "<br><b>Kecamatan:</b> "+feature.properties.KECAMATAN
-  );
+fetch("DATA BSPS DAN RTLH.geojson")
+.then(res=>res.json())
+.then(data=>{
+  dataGeojson = data;
+
+  batasLayer = L.geoJSON(dataGeojson,{
+    style:styleBatas
+  }).addTo(map);
+
+  map.fitBounds(batasLayer.getBounds());
+
+  updateTitik();
+});
+
+function getRadius(jumlah){
+  let r = Math.sqrt(jumlah) * 2;
+  return isMobile() ? r * 0.7 : r;
 }
 
-// ================= AGREGASI KECAMATAN =================
 function agregasiKecamatan(field){
 
   let hasil={};
@@ -111,12 +106,10 @@ function agregasiKecamatan(field){
   return hasil;
 }
 
-// ================= UPDATE TITIK =================
 function updateTitik(){
 
   let tahun = document.getElementById("tahun").value;
   let jenis = document.getElementById("jenis").value;
-
   let field = jenis+" "+tahun;
   let warna = jenis === "RTLH" ? "green" : "blue";
 
@@ -124,8 +117,10 @@ function updateTitik(){
 
   titikLayer = L.layerGroup();
 
-  // ZOOM JAUH → KECAMATAN
-  if(map.getZoom() < 13){
+  let zoomBatas = isMobile() ? 14 : 13;
+
+  // ================= KECAMATAN =================
+  if(map.getZoom() < zoomBatas){
 
     let dataKec = agregasiKecamatan(field);
 
@@ -136,52 +131,58 @@ function updateTitik(){
       let lat = item.coords.reduce((a,b)=>a+b.lat,0)/item.coords.length;
       let lng = item.coords.reduce((a,b)=>a+b.lng,0)/item.coords.length;
 
-      L.circleMarker([lat,lng],{
-        radius:Math.sqrt(item.total)*2,
+      let marker = L.circleMarker([lat,lng],{
+        radius:getRadius(item.total),
         fillColor:warna,
         color:"#fff",
         weight:1,
         fillOpacity:0.9
-      })
-      .bindTooltip(kec+"<br>"+item.total,{permanent:true})
-      .addTo(titikLayer);
+      });
+
+      if(!isMobile()){
+        marker.bindTooltip(kec+"<br>"+item.total,{permanent:true});
+      }
+
+      titikLayer.addLayer(marker);
     }
 
   }
   else{
 
-    // ZOOM DEKAT → DESA
+    // ================= DESA =================
     dataGeojson.features.forEach(f=>{
 
       let jumlah = f.properties[field] || 0;
-
       let center = L.geoJSON(f).getBounds().getCenter();
 
-      L.circleMarker(center,{
-        radius:Math.sqrt(jumlah)*2,
+      let marker = L.circleMarker(center,{
+        radius:getRadius(jumlah),
         fillColor:warna,
         color:"#fff",
         weight:1,
         fillOpacity:0.9
-      })
-      .bindTooltip(jumlah.toString(),{permanent:true})
-      .addTo(titikLayer);
+      });
 
+      if(map.getZoom() >= (isMobile()?15:13)){
+        marker.bindTooltip(jumlah.toString(),{
+          permanent:true,
+          direction:"center"
+        });
+      }
+
+      titikLayer.addLayer(marker);
     });
-
   }
 
   titikLayer.addTo(map);
 
-  // UPDATE WARNA POLYGON
   batasLayer.setStyle(styleBatas);
 }
 
-// ================= EVENT =================
 map.on("zoomend",updateTitik);
 document.getElementById("tahun").addEventListener("change",updateTitik);
 document.getElementById("jenis").addEventListener("change",updateTitik);
-
 </script>
+
 </body>
 </html>
