@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
-<title>WebGIS RTLH & BSPS Ngawi</title>
+<title>WEBGIS RTLH & BSPS Kabupaten Ngawi</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
@@ -12,6 +12,16 @@
 
 <div id="map"></div>
 
+<!-- LOGO -->
+<div class="logo-box">
+  <img src="logo-ngawi.png" alt="Logo Ngawi">
+  <div class="logo-text">
+    <b>WEBGIS RTLH & BSPS</b><br>
+    Kabupaten Ngawi
+  </div>
+</div>
+
+<!-- PANEL FILTER -->
 <div class="topbar">
 
   <div class="filter-row">
@@ -36,17 +46,23 @@
 
 </div>
 
+<!-- INFO PROGRAM -->
 <div class="info-program" id="infoProgram"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-const map = L.map('map').setView([-7.4,111.4],11);
+document.addEventListener("DOMContentLoaded", function(){
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  const map = L.map('map').setView([-7.4,111.4],11);
 
-// Geser tombol zoom
-map.zoomControl.setPosition('topleft');
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap'
+  }).addTo(map);
+
+  map.zoomControl.setPosition('topleft');
+
+});
 </script>
 
 </body>
