@@ -1,71 +1,26 @@
-body{
+html, body{
+  height:100%;
   margin:0;
-  font-family: 'Segoe UI', sans-serif;
-  background:#f4f6f9;
-}
-
-/* NAVBAR */
-.navbar{
-  background:#1e3a8a;
-  color:white;
-  display:flex;
-  justify-content:space-between;
-  padding:15px 30px;
-  align-items:center;
-}
-
-.navbar nav a{
-  color:white;
-  margin-left:20px;
-  text-decoration:none;
-  font-weight:500;
-}
-
-/* CARD STATISTIK */
-.cards{
-  display:flex;
-  gap:20px;
-  padding:20px 30px;
-}
-
-.card{
-  flex:1;
-  background:#334155;
-  color:white;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.15);
-}
-
-.card h2{
-  margin:0;
-  font-size:32px;
-}
-
-/* MAP */
-.map-section{
-  padding:0 30px 30px 30px;
-}
-
-.map-card{
-  background:white;
-  border-radius:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
-  padding:15px;
 }
 
 #map{
-  height:500px;
-  border-radius:10px;
+  height:100vh;
+  width:100%;
 }
 
-/* RESPONSIVE */
-@media(max-width:768px){
-  .cards{
-    flex-direction:column;
-  }
+/* FILTER TAHUN */
+.topbar{
+  position:absolute;
+  top:10px;
+  left:50px;
+  z-index:1000;
+  background:white;
+  padding:8px 12px;
+  border-radius:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
 
-  #map{
-    height:400px;
-  }
+select{
+  padding:5px;
+  font-size:14px;
 }
