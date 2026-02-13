@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <title>WEBGIS RTLH & BSPS Kabupaten Ngawi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="style.css"/>
@@ -12,11 +12,10 @@
 
 <div id="map"></div>
 
-<!-- PANEL FILTER -->
+<!-- PANEL -->
 <div class="topbar">
 
   <div class="filter-row">
-
     <select id="jenis">
       <option value="RTLH">RTLH</option>
       <option value="BSPS">BSPS</option>
@@ -29,7 +28,6 @@
     <select id="filterDesa">
       <option value="">Pilih Desa</option>
     </select>
-
   </div>
 
   <div class="slider-row">
@@ -41,19 +39,15 @@
 
 <!-- LOGO -->
 <div class="logo-box">
-  <img src="logo-ngawi.png" alt="Logo Ngawi">
+  <img src="logo-ngawi.png">
   <div class="logo-text">
-    <b>WEBGIS RTLH & BSPS</b><br>
-    Kabupaten Ngawi
+    <b>WEBGIS RTLH & BSPS</b><br>Kabupaten Ngawi
   </div>
 </div>
 
-<!-- INFO PROGRAM -->
 <div id="infoProgram" class="info-program"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<!-- SCRIPT WEBGIS KAMU -->
 <script src="script.js"></script>
 
 </body>
