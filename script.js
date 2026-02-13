@@ -1,9 +1,7 @@
 document.addEventListener("DOMContentLoaded", function(){
 
 const map = L.map('map').setView([-7.4,111.4],11);
-
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-map.zoomControl.setPosition('topleft');
 
 const jenis = document.getElementById("jenis");
 const tahun = document.getElementById("tahun");
@@ -12,7 +10,8 @@ const filterKecamatan = document.getElementById("filterKecamatan");
 const filterDesa = document.getElementById("filterDesa");
 const infoProgram = document.getElementById("infoProgram");
 
-let geoLayer, titikLayer, dataGeojson;
+let geoLayer, titikLayer, selectedLayer;
+let dataGeojson;
 let dataDesaPerKecamatan={};
 
 function getColor(d){
@@ -35,43 +34,33 @@ fillOpacity:0.7
 };
 }
 
-fetch("./data-bsps-rtlh.geojson")
-.then(res=>res.json())
-.then(data=>{
-
-dataGeojson=data;
-
-geoLayer=L.geoJSON(data,{
-style:style,
-onEachFeature:(feature,layer)=>{
-
-let kec=feature.properties.KECAMATAN;
-let desa=feature.properties.DESA;
-
-if(!dataDesaPerKecamatan[kec]){
-dataDesaPerKecamatan[kec]=[];
-filterKecamatan.innerHTML+=`<option>${kec}</option>`;
+function highlightLayer(layer){
+if(selectedLayer){geoLayer.resetStyle(selectedLayer);}
+layer.setStyle({color:"yellow",weight:3,dashArray:"6,6"});
+selectedLayer = layer;
 }
 
-dataDesaPerKecamatan[kec].push(desa);
+function updateInfo(){
 
-layer.on("click",()=>{
-map.fitBounds(layer.getBounds());
-});
+let thn = tahun.value;
+let jns = jenis.value;
 
+if(jns==="RTLH"){
+if(thn==="2023"){
+infoProgram.innerHTML="<b>RTLH 2023</b><br>Dinas Pemberdayaan Masyarakat dan Desa Kabupaten Ngawi";
+}else{
+infoProgram.innerHTML="<b>RTLH "+thn+"</b><br>Dinas Perumahan Rakyat dan Kawasan Permukiman Kabupaten Ngawi";
 }
-}).addTo(map);
-
-map.fitBounds(geoLayer.getBounds());
-updateTitik();
-
-});
+}else{
+infoProgram.innerHTML="<b>BSPS "+thn+"</b><br>BP3KP Jawa IV<br>Kementerian PKP";
+}
+}
 
 function getRadius(j){return Math.sqrt(j)*2;}
 
 function updateTitik(){
 
-if(titikLayer)map.removeLayer(titikLayer);
+if(titikLayer) map.removeLayer(titikLayer);
 titikLayer=L.layerGroup();
 
 let field=jenis.value+" "+tahun.value;
@@ -96,7 +85,70 @@ fillOpacity:0.9
 titikLayer.addTo(map);
 }
 
-jenis.onchange=()=>{geoLayer.setStyle(style);updateTitik();}
-tahun.oninput=()=>{labelTahun.innerHTML=tahun.value;geoLayer.setStyle(style);updateTitik();}
+fetch("data-bsps-rtlh.geojson")
+.then(res=>res.json())
+.then(data=>{
+
+dataGeojson=data;
+
+geoLayer=L.geoJSON(data,{
+style:style,
+onEachFeature:(feature,layer)=>{
+
+let kec=feature.properties.KECAMATAN;
+let desa=feature.properties.DESA;
+
+if(!dataDesaPerKecamatan[kec]){
+dataDesaPerKecamatan[kec]=[];
+filterKecamatan.innerHTML+=`<option value="${kec}">${kec}</option>`;
+}
+
+dataDesaPerKecamatan[kec].push(desa);
+
+layer.on("click",()=>{
+highlightLayer(layer);
+map.fitBounds(layer.getBounds());
+});
+
+}
+}).addTo(map);
+
+map.fitBounds(geoLayer.getBounds());
+updateTitik();
+updateInfo();
+
+});
+
+jenis.onchange=()=>{geoLayer.setStyle(style);updateTitik();updateInfo();}
+tahun.oninput=()=>{labelTahun.innerHTML=tahun.value;geoLayer.setStyle(style);updateTitik();updateInfo();}
+
+filterKecamatan.onchange=function(){
+
+filterDesa.innerHTML='<option value="">Pilih Desa</option>';
+
+dataDesaPerKecamatan[this.value].forEach(d=>{
+filterDesa.innerHTML+=`<option value="${d}">${d}</option>`;
+});
+
+let layers=[];
+
+geoLayer.eachLayer(l=>{
+if(l.feature.properties.KECAMATAN===this.value){layers.push(l);}
+});
+
+map.fitBounds(L.featureGroup(layers).getBounds());
+
+};
+
+filterDesa.onchange=function(){
+
+geoLayer.eachLayer(l=>{
+if(l.feature.properties.DESA===this.value){
+highlightLayer(l);
+map.fitBounds(l.getBounds());
+}
+});
+
+};
 
 });
