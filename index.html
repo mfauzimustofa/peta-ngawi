@@ -10,307 +10,43 @@
 </head>
 <body>
 
+<div id="map"></div>
+
 <div class="topbar">
 
-  <div class="slider-container">
+  <div class="filter-row">
+    <select id="jenis">
+      <option value="RTLH">RTLH</option>
+      <option value="BSPS">BSPS</option>
+    </select>
+
+    <select id="filterKecamatan">
+      <option value="">Pilih Kecamatan</option>
+    </select>
+
+    <select id="filterDesa">
+      <option value="">Pilih Desa</option>
+    </select>
+  </div>
+
+  <div class="slider-row">
     <span id="labelTahun">2025</span>
     <input type="range" id="tahun" min="2021" max="2025" step="1" value="2025">
   </div>
 
-  <select id="jenis">
-    <option value="RTLH">RTLH</option>
-    <option value="BSPS">BSPS</option>
-  </select>
-
-  <select id="filterKecamatan">
-    <option value="">Pilih Kecamatan</option>
-  </select>
-
-  <select id="filterDesa">
-    <option value="">Pilih Desa</option>
-  </select>
-
 </div>
 
-<div id="map"></div>
 <div class="info-program" id="infoProgram"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
-
 const map = L.map('map').setView([-7.4,111.4],11);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-const tahunSlider = document.getElementById("tahun");
-const labelTahun = document.getElementById("labelTahun");
-const jenisSelect = document.getElementById("jenis");
-const filterKecamatan = document.getElementById("filterKecamatan");
-const filterDesa = document.getElementById("filterDesa");
-const infoProgram = document.getElementById("infoProgram");
-
-let dataGeojson;
-let batasLayer;
-let titikLayer;
-let dataDesaPerKecamatan = {};
-
-function isMobile(){ return window.innerWidth <= 768; }
-
-function getColor(d){
-  return d > 50 ? '#084594' :
-         d > 30 ? '#2171b5' :
-         d > 20 ? '#4292c6' :
-         d > 10 ? '#6baed6' :
-         d > 0  ? '#9ecae1' :
-                  '#f1f1f1';
-}
-
-function styleBatas(feature){
-  let field = jenisSelect.value+" "+tahunSlider.value;
-  let value = feature.properties[field] || 0;
-
-  return {
-    fillColor:getColor(value),
-    weight:1,
-    color:"#444",
-    fillOpacity:0.7
-  };
-}
-
-fetch("DATA BSPS DAN RTLH.geojson")
-.then(res=>res.json())
-.then(data=>{
-
-  dataGeojson = data;
-
-  isiDropdown();
-
-  batasLayer = L.geoJSON(dataGeojson,{
-    style:styleBatas,
-    onEachFeature:onEachFeature
-  }).addTo(map);
-
-  map.fitBounds(batasLayer.getBounds());
-
-  updateTitik();
-  updateInfoProgram();
-});
-
-function isiDropdown(){
-
-  let kecamatan = new Set();
-
-  dataGeojson.features.forEach(f=>{
-
-    let kec = f.properties.KECAMATAN;
-    let desa = f.properties.DESA;
-
-    kecamatan.add(kec);
-
-    if(!dataDesaPerKecamatan[kec]){
-      dataDesaPerKecamatan[kec] = [];
-    }
-
-    dataDesaPerKecamatan[kec].push(desa);
-  });
-
-  Array.from(kecamatan).sort().forEach(k=>{
-    filterKecamatan.innerHTML += `<option value="${k}">${k}</option>`;
-  });
-}
-
-function onEachFeature(feature,layer){
-
-  layer.on("click", function(){
-
-    let tahun = tahunSlider.value;
-
-    let rtlh = feature.properties["RTLH "+tahun] || 0;
-    let bsps = feature.properties["BSPS "+tahun] || 0;
-
-    batasLayer.resetStyle();
-
-    layer.setStyle({
-      weight:2,
-      color:"#000",
-      fillOpacity:0.9
-    });
-
-    layer.bindPopup(
-      "<b>Desa :</b> "+feature.properties.DESA+
-      "<br><b>Kecamatan :</b> "+feature.properties.KECAMATAN+
-      "<hr>"+
-      "<b>RTLH "+tahun+" :</b> "+rtlh+
-      "<br><b>BSPS "+tahun+" :</b> "+bsps
-    ).openPopup();
-
-  });
-}
-
-function getRadius(jumlah){
-  let r = Math.sqrt(jumlah)*2;
-  return isMobile()? r*0.7 : r;
-}
-
-function agregasiKecamatan(field){
-
-  let hasil={};
-
-  dataGeojson.features.forEach(f=>{
-
-    let kec = f.properties.KECAMATAN;
-    let jumlah = f.properties[field] || 0;
-
-    if(!hasil[kec]){
-      hasil[kec]={total:0, coords:[]};
-    }
-
-    hasil[kec].total += jumlah;
-
-    let center = L.geoJSON(f).getBounds().getCenter();
-    hasil[kec].coords.push(center);
-  });
-
-  return hasil;
-}
-
-function updateTitik(){
-
-  if(!dataGeojson) return;
-
-  let field = jenisSelect.value+" "+tahunSlider.value;
-  let warna = jenisSelect.value === "RTLH" ? "green" : "blue";
-
-  if(titikLayer) map.removeLayer(titikLayer);
-
-  titikLayer = L.layerGroup();
-
-  let zoomBatas = isMobile()?14:13;
-
-  if(map.getZoom() < zoomBatas){
-
-    let dataKec = agregasiKecamatan(field);
-
-    for(let kec in dataKec){
-
-      let item = dataKec[kec];
-
-      let lat = item.coords.reduce((a,b)=>a+b.lat,0)/item.coords.length;
-      let lng = item.coords.reduce((a,b)=>a+b.lng,0)/item.coords.length;
-
-      titikLayer.addLayer(
-        L.circleMarker([lat,lng],{
-          radius:getRadius(item.total),
-          fillColor:warna,
-          color:"#fff",
-          weight:1,
-          fillOpacity:0.9
-        })
-      );
-    }
-
-  } else {
-
-    dataGeojson.features.forEach(f=>{
-
-      let jumlah = f.properties[field] || 0;
-      let center = L.geoJSON(f).getBounds().getCenter();
-
-      titikLayer.addLayer(
-        L.circleMarker(center,{
-          radius:getRadius(jumlah),
-          fillColor:warna,
-          color:"#fff",
-          weight:1,
-          fillOpacity:0.9
-        })
-      );
-    });
-  }
-
-  titikLayer.addTo(map);
-  batasLayer.setStyle(styleBatas);
-}
-
-function updateInfoProgram(){
-
-  let tahun = tahunSlider.value;
-  let jenis = jenisSelect.value;
-
-  if(jenis === "RTLH"){
-
-    if(tahun === "2023"){
-      infoProgram.innerHTML =
-        "<b>RTLH "+tahun+"</b><br>DPMD Kabupaten Ngawi (Dana Desa)";
-    }else{
-      infoProgram.innerHTML =
-        "<b>RTLH "+tahun+"</b><br>Dinas Perumahan Rakyat dan Kawasan Permukiman Kabupaten Ngawi";
-    }
-
-  }else{
-
-    infoProgram.innerHTML =
-      "<b>BSPS "+tahun+"</b><br>BP3KP Jawa IV<br>Kementerian PKP";
-  }
-}
-
-/* EVENT */
-
-tahunSlider.oninput = ()=>{
-  labelTahun.innerHTML = tahunSlider.value;
-  updateTitik();
-  updateInfoProgram();
-};
-
-jenisSelect.onchange = ()=>{
-  updateTitik();
-  updateInfoProgram();
-};
-
-filterKecamatan.onchange = function(){
-
-  let kec = this.value;
-
-  filterDesa.innerHTML = '<option value="">Pilih Desa</option>';
-
-  if(!kec) return;
-
-  dataDesaPerKecamatan[kec].sort().forEach(d=>{
-    filterDesa.innerHTML += `<option value="${d}">${d}</option>`;
-  });
-
-  batasLayer.eachLayer(layer=>{
-    if(layer.feature.properties.KECAMATAN === kec){
-
-      let center = layer.getBounds().getCenter();
-      map.flyTo(center,13,{duration:1.2});
-
-    }
-  });
-};
-
-filterDesa.onchange = function(){
-
-  let desa = this.value;
-
-  batasLayer.eachLayer(layer=>{
-    if(layer.feature.properties.DESA === desa){
-
-      let center = layer.getBounds().getCenter();
-      map.flyTo(center,15,{duration:1.2});
-
-      layer.fire("click");
-    }
-  });
-};
-
-map.on("zoomend",updateTitik);
-
-labelTahun.innerHTML = tahunSlider.value;
-
-});
+// Geser tombol zoom
+map.zoomControl.setPosition('topleft');
 </script>
 
 </body>
