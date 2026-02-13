@@ -5,49 +5,98 @@
 <title>WEBGIS RTLH & BSPS Kabupaten Ngawi</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+html, body{
+  height:100%;
+  margin:0;
+  font-family:Segoe UI, sans-serif;
+}
+
+#map{
+  height:100vh;
+}
+
+/* LOGO */
+.logo-box{
+  position:absolute;
+  top:15px;
+  left:15px;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:white;
+  padding:8px 12px;
+  border-radius:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.25);
+}
+
+.logo-box img{
+  height:42px;
+}
+
+/* PANEL */
+.topbar{
+  position:absolute;
+  top:15px;
+  left:160px;
+  z-index:1000;
+  width:520px;
+  background:white;
+  padding:14px;
+  border-radius:14px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+}
+
+.filter-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.filter-row select{
+  flex:1;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.slider-row input{
+  width:100%;
+}
+
+.leaflet-top.leaflet-left{
+  top:120px;
+}
+</style>
+
 </head>
 <body>
 
 <div id="map"></div>
 
-<!-- LOGO -->
 <div class="logo-box">
-  <img src="logo-ngawi.png" alt="Logo Ngawi">
-  <div class="logo-text">
+  <img src="logo-ngawi.png">
+  <div>
     <b>WEBGIS RTLH & BSPS</b><br>
     Kabupaten Ngawi
   </div>
 </div>
 
-<!-- PANEL FILTER -->
 <div class="topbar">
-
   <div class="filter-row">
-    <select id="jenis">
-      <option value="RTLH">RTLH</option>
-      <option value="BSPS">BSPS</option>
-    </select>
-
-    <select id="filterKecamatan">
-      <option value="">Pilih Kecamatan</option>
-    </select>
-
-    <select id="filterDesa">
-      <option value="">Pilih Desa</option>
-    </select>
+    <select><option>RTLH</option></select>
+    <select><option>Pilih Kecamatan</option></select>
+    <select><option>Pilih Desa</option></select>
   </div>
 
   <div class="slider-row">
-    <span id="labelTahun">2025</span>
-    <input type="range" id="tahun" min="2021" max="2025" step="1" value="2025">
+    <input type="range">
   </div>
-
 </div>
-
-<!-- INFO PROGRAM -->
-<div class="info-program" id="infoProgram"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -56,11 +105,10 @@ document.addEventListener("DOMContentLoaded", function(){
 
   const map = L.map('map').setView([-7.4,111.4],11);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© OpenStreetMap'
-  }).addTo(map);
-
-  map.zoomControl.setPosition('topleft');
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution:'© OpenStreetMap'}
+  ).addTo(map);
 
 });
 </script>
