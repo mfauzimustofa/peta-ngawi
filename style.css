@@ -9,7 +9,7 @@ html, body{
   width:100%;
 }
 
-/* PANEL FILTER */
+/* TOPBAR */
 .topbar{
   position:absolute;
   top:15px;
@@ -24,6 +24,7 @@ html, body{
 
   display:flex;
   gap:8px;
+  flex-wrap:wrap;
   backdrop-filter:blur(4px);
 }
 
@@ -31,8 +32,21 @@ html, body{
   padding:6px 10px;
   border-radius:6px;
   border:1px solid #ccc;
-  font-size:14px;
+  font-size:13px;
   cursor:pointer;
+  max-width:160px;
+}
+
+/* SLIDER */
+.slider-container{
+  display:flex;
+  flex-direction:column;
+  font-size:12px;
+  font-weight:600;
+}
+
+#tahun{
+  width:140px;
 }
 
 /* POPUP */
@@ -69,8 +83,13 @@ html, body{
   }
 
   .topbar select{
-    font-size:12px;
+    font-size:11px;
     padding:4px 6px;
+    max-width:130px;
+  }
+
+  #tahun{
+    width:120px;
   }
 
   .leaflet-tooltip{
