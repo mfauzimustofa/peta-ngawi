@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"/>
-  <title>WEBGIS RTLH & BSPS Kabupaten Ngawi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8"/>
+<title>WEBGIS RTLH & BSPS Kabupaten Ngawi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
 <div id="map"></div>
 
-<!-- PANEL -->
 <div class="topbar">
-
   <div class="filter-row">
+
     <select id="jenis">
       <option value="RTLH">RTLH</option>
       <option value="BSPS">BSPS</option>
@@ -28,16 +27,15 @@
     <select id="filterDesa">
       <option value="">Pilih Desa</option>
     </select>
+
   </div>
 
   <div class="slider-row">
     <span id="labelTahun">2025</span>
     <input type="range" id="tahun" min="2021" max="2025" value="2025">
   </div>
-
 </div>
 
-<!-- LOGO -->
 <div class="logo-box">
   <img src="logo-ngawi.png">
   <div class="logo-text">
