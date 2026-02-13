@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", function(){
 
 const map = L.map('map').setView([-7.4,111.4],11);
 
+map.createPane("labels");
+map.getPane("labels").style.zIndex = 650;
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 const jenis = document.getElementById("jenis");
@@ -11,12 +14,12 @@ const filterKecamatan = document.getElementById("filterKecamatan");
 const filterDesa = document.getElementById("filterDesa");
 
 let geoLayer,labelLayer,dataGeojson;
+let highlighted=[];
 let dataDesaPerKecamatan={};
-let highlightedLayers=[];
 
 labelTahun.innerHTML=tahun.value;
 
-/* ================= WARNA ================= */
+/* WARNA */
 function getColor(d){
 return d>50?'#084594':
 d>30?'#2171b5':
@@ -37,23 +40,22 @@ fillOpacity:0.7
 };
 }
 
-/* ================= HIGHLIGHT ================= */
+/* HIGHLIGHT */
 function resetHighlight(){
-highlightedLayers.forEach(l=>geoLayer.resetStyle(l));
-highlightedLayers=[];
+highlighted.forEach(l=>geoLayer.resetStyle(l));
+highlighted=[];
 }
 
 function highlight(layer){
 layer.setStyle({
 color:"yellow",
 weight:3,
-dashArray:"6,6",
-fillOpacity:0.9
+dashArray:"6,6"
 });
-highlightedLayers.push(layer);
+highlighted.push(layer);
 }
 
-/* ================= POPUP ================= */
+/* POPUP */
 function popupContent(f){
 
 let thn=tahun.value;
@@ -67,7 +69,7 @@ BSPS ${thn} : <b>${f.properties["BSPS "+thn]||0}</b>
 `;
 }
 
-/* ================= LABEL ================= */
+/* LABEL */
 function updateLabel(){
 
 if(labelLayer) map.removeLayer(labelLayer);
@@ -85,6 +87,7 @@ let jumlah=l.feature.properties[field]||0;
 
 labelLayer.addLayer(
 L.marker(center,{
+pane:"labels",
 interactive:false,
 icon:L.divIcon({
 className:"label-jumlah",
@@ -97,10 +100,9 @@ html:jumlah
 
 labelLayer.addTo(map);
 }
-
 }
 
-/* ================= LOAD DATA ================= */
+/* LOAD DATA */
 fetch("data-bsps-rtlh.geojson")
 .then(res=>res.json())
 .then(data=>{
@@ -122,6 +124,7 @@ filterKecamatan.innerHTML+=`<option value="${kec}">${kec}</option>`;
 dataDesaPerKecamatan[kec].push(desa);
 
 layer.on("click",()=>{
+
 resetHighlight();
 highlight(layer);
 
@@ -138,18 +141,21 @@ updateLabel();
 }).addTo(map);
 
 map.fitBounds(geoLayer.getBounds());
+
 updateLabel();
 
 });
 
-/* ================= ZOOM EVENT ================= */
+/* EVENT */
 map.on("zoomend",updateLabel);
 
-/* ================= DROPDOWN KECAMATAN ================= */
+jenis.onchange=()=>{geoLayer.setStyle(style);updateLabel();}
+tahun.oninput=()=>{labelTahun.innerHTML=tahun.value;geoLayer.setStyle(style);updateLabel();}
+
+/* DROPDOWN KECAMATAN */
 filterKecamatan.onchange=function(){
 
 resetHighlight();
-
 filterDesa.innerHTML='<option value="">Pilih Desa</option>';
 
 let layers=[];
@@ -166,12 +172,11 @@ filterDesa.innerHTML+=`<option value="${d}">${d}</option>`;
 });
 
 map.flyToBounds(L.featureGroup(layers).getBounds(),{duration:0.7});
-
 setTimeout(updateLabel,700);
 
 };
 
-/* ================= DROPDOWN DESA ================= */
+/* DROPDOWN DESA */
 filterDesa.onchange=function(){
 
 resetHighlight();
@@ -189,12 +194,9 @@ updateLabel();
 },700);
 
 }
+
 });
 
 };
-
-/* ================= FILTER ================= */
-jenis.onchange=()=>{geoLayer.setStyle(style);updateLabel();}
-tahun.oninput=()=>{labelTahun.innerHTML=tahun.value;geoLayer.setStyle(style);updateLabel();}
 
 });
