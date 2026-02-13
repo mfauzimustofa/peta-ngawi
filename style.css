@@ -9,14 +9,45 @@ html, body{
   width:100%;
 }
 
+/* ================= LOGO ================= */
+
+.logo-box{
+  position:absolute;
+  top:15px;
+  left:15px;
+  z-index:1000;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  background:rgba(255,255,255,0.95);
+  padding:8px 12px;
+  border-radius:12px;
+
+  box-shadow:0 3px 10px rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+}
+
+.logo-box img{
+  height:42px;
+}
+
+.logo-text{
+  font-size:13px;
+  line-height:1.2;
+}
+
 /* ================= PANEL ================= */
 
 .topbar{
   position:absolute;
   top:15px;
-  left:70px;
-  right:20px;
+  left:160px;
   z-index:1000;
+
+  width:520px;
+  max-width:calc(100% - 180px);
 
   background:rgba(255,255,255,0.95);
   padding:14px 16px;
@@ -26,7 +57,6 @@ html, body{
   backdrop-filter: blur(6px);
 }
 
-/* DROPDOWN SEJAJAR */
 .filter-row{
   display:flex;
   gap:12px;
@@ -39,10 +69,10 @@ html, body{
   border-radius:10px;
   border:1px solid #ccc;
   font-size:14px;
-  background:white;
 }
 
 /* SLIDER */
+
 .slider-row{
   display:flex;
   flex-direction:column;
@@ -58,11 +88,12 @@ html, body{
   width:100%;
 }
 
-/* INFO PROGRAM */
+/* ================= INFO PROGRAM ================= */
+
 .info-program{
   position:absolute;
   bottom:20px;
-  left:70px;
+  left:15px;
   z-index:1000;
 
   background:rgba(255,255,255,0.95);
@@ -76,21 +107,36 @@ html, body{
   line-height:1.5;
 }
 
-/* ================= ZOOM CONTROL ================= */
+/* ================= POSISI ZOOM ================= */
 
 .leaflet-top.leaflet-left{
   top:120px;
   left:15px;
 }
 
-/* ================= RESPONSIVE MOBILE ================= */
+/* ================= MOBILE ================= */
 
 @media (max-width:768px){
+
+  .logo-box{
+    top:10px;
+    left:10px;
+  }
+
+  .logo-box img{
+    height:34px;
+  }
+
+  .logo-text{
+    font-size:11px;
+  }
 
   .topbar{
     left:10px;
     right:10px;
-    top:10px;
+    width:auto;
+    max-width:100%;
+    top:70px;
   }
 
   .filter-row{
@@ -100,7 +146,7 @@ html, body{
   .info-program{
     left:10px;
     right:10px;
-    bottom:15px;
+    bottom:10px;
     max-width:100%;
     font-size:12px;
   }
