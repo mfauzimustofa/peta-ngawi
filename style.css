@@ -1,93 +1,23 @@
-/* ================= GLOBAL ================= */
-
-body {
+html, body {
+  height: 100%;
   margin: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f4f6f9;
+  font-family: Arial, sans-serif;
 }
-
-/* ================= HEADER ================= */
-
-.header {
-  background: linear-gradient(90deg, #1f3c88, #2952cc);
-  color: white;
-  padding: 18px 20px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.header-title {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.header-sub {
-  font-size: 14px;
-  opacity: 0.9;
-  margin-top: 4px;
-}
-
-/* ================= CONTROL PANEL ================= */
-
-.control-panel {
-  background: white;
-  padding: 12px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #ddd;
-}
-
-.stat-box {
-  font-weight: bold;
-  color: #1f3c88;
-  font-size: 15px;
-}
-
-/* ================= MAP ================= */
 
 #map {
   width: 100%;
-  height: 75vh;
+  height: 100vh;
 }
 
-/* ================= POPUP STYLE ================= */
-
+/* POPUP BIAR RAPI */
 .leaflet-popup-content {
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
-.leaflet-popup-content b {
-  color: #1f3c88;
-}
-
-/* ================= FOOTER ================= */
-
-footer {
-  background: #1f3c88;
-  color: white;
-  text-align: center;
-  padding: 12px;
-  font-size: 12px;
-}
-
-/* ================= RESPONSIVE ================= */
-
+/* RESPONSIVE MOBILE */
 @media (max-width: 768px) {
-
-  .header-title {
-    font-size: 16px;
+  .leaflet-popup-content {
+    font-size: 12px;
   }
-
-  .control-panel {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  #map {
-    height: 65vh;
-  }
-
 }
