@@ -1,90 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WebGIS RTLH 2025</title>
+  <meta charset="utf-8" />
+  <title>WebGIS RTLH Kabupaten Ngawi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
-
 <body>
-
-<header class="header">
-  🏠 WebGIS RTLH Kabupaten Ngawi 2025
-</header>
-
-<div class="control-panel">
-  Total Penerima 2025:
-  <span id="totalPenerima">0</span> Unit
-</div>
 
 <div id="map"></div>
 
-<footer>
-  © 2026 Fauzi Mustofa
-</footer>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
+var map = L.map('map');
 
-var map = L.map('map').setView([-7.4, 111.4], 10);
+// BASMAP
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
 
-L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  { attribution: '&copy; OpenStreetMap' }
-).addTo(map);
-
-function getColor(value) {
-  return value >= 5 ? "#d73027" :
-         value >= 3 ? "#fc8d59" :
-         value >= 1 ? "#91cf60" :
-                      "#e0e0e0";
+// STYLE DEFAULT
+function style() {
+  return {
+    color: "#3388ff",
+    weight: 2,
+    fillOpacity: 0.5
+  };
 }
 
-fetch('PB RTLH 2025.geojson')
+// HIGHLIGHT SAAT DIKLIK
+function highlightFeature(e) {
+  var layer = e.target;
+
+  layer.setStyle({
+    weight: 3,
+    color: "#ff0000",
+    fillOpacity: 0.7
+  });
+
+  layer.bringToFront();
+}
+
+// RESET STYLE
+function resetHighlight(e) {
+  geojson.resetStyle(e.target);
+}
+
+// POPUP
+function onEachFeature(feature, layer) {
+
+  layer.on({
+    click: highlightFeature
+  });
+
+  layer.bindPopup(
+    "<b>Desa:</b> " + feature.properties.DESA +
+    "<br><b>Kecamatan:</b> " + feature.properties.KECAMATAN +
+    "<br><hr>" +
+    "<b>RTLH 2021:</b> " + feature.properties["RTLH 2021"] +
+    "<br><b>RTLH 2022:</b> " + feature.properties["RTLH 2022"] +
+    "<br><b>RTLH 2024:</b> " + feature.properties["RTLH 2024"] +
+    "<br><b>RTLH 2025:</b> " + feature.properties["RTLH 2025"]
+  );
+}
+
+// LOAD GEOJSON
+fetch("DATA BSPS DAN RTLH.geojson")
 .then(res => res.json())
 .then(data => {
 
-  var total = 0;
-
-  var layer = L.geoJSON(data, {
-
-    style: function(feature) {
-      var jumlah = feature.properties.Jml_PB || 0;
-      return {
-        fillColor: getColor(jumlah),
-        weight: 1,
-        color: "#666",
-        fillOpacity: 0.7
-      };
-    },
-
-    onEachFeature: function(feature, layer) {
-
-      var desa = feature.properties.DESA || "-";
-      var kec = feature.properties.KECAMATAN || "-";
-      var jumlah = feature.properties.Jml_PB || 0;
-
-      total += jumlah;
-
-      layer.bindPopup(
-        "<b>Desa:</b> " + desa + "<br>" +
-        "<b>Kecamatan:</b> " + kec + "<br>" +
-        "<b>Penerima:</b> " + jumlah
-      );
-    }
-
+  geojson = L.geoJSON(data, {
+    style: style,
+    onEachFeature: onEachFeature
   }).addTo(map);
 
-  map.fitBounds(layer.getBounds());
-
-  document.getElementById("totalPenerima").innerText = total;
+  map.fitBounds(geojson.getBounds());
 
 });
-
 </script>
 
 </body>
