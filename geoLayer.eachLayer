@@ -85,20 +85,8 @@ geoLayer.eachLayer(l=>{
 let center=l.getBounds().getCenter();
 let jumlah=l.feature.properties[field]||0;
 
-let kecamatan = "Kecamatan " + l.feature.properties.KECAMATAN;
-
-labelLayer.addLayer(
-  L.marker(center, {
-    pane: "labels",
-    interactive: false,
-    icon: L.divIcon({
-      className: "label-jumlah",
-      html: jumlah
-    })
-  })
-);
-
 // Tambah label kecamatan
+let kecamatan = "Kecamatan " + l.feature.properties.KECAMATAN;
 labelLayer.addLayer(
   L.marker(center, {
     pane: "labels",
