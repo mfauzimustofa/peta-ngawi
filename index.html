@@ -1,84 +1,70 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <title>WebGIS RTLH Kabupaten Ngawi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<div id="map"></div>
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="logo">WEBGIS RTLH NGAWI</div>
+  <nav>
+    <a href="#">Beranda</a>
+    <a href="#">Peta</a>
+    <a href="#">Data</a>
+    <a href="#">Tentang</a>
+  </nav>
+</header>
+
+<!-- STATISTIK -->
+<section class="cards">
+  <div class="card">
+    <h2>3.654</h2>
+    <p>Jumlah Tersurvei</p>
+  </div>
+
+  <div class="card">
+    <h2>280</h2>
+    <p>Jumlah RTLH</p>
+  </div>
+
+  <div class="card">
+    <h2>282</h2>
+    <p>Siap Huni</p>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-section">
+  <div class="map-card">
+    <div id="map"></div>
+  </div>
+</section>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-var map = L.map('map');
+var map = L.map('map').setView([-7.4,111.4],11);
 
-// BASMAP
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap'
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'&copy; OpenStreetMap'
 }).addTo(map);
 
-// STYLE DEFAULT
-function style() {
-  return {
-    color: "#3388ff",
-    weight: 2,
-    fillOpacity: 0.5
-  };
-}
-
-// HIGHLIGHT SAAT DIKLIK
-function highlightFeature(e) {
-  var layer = e.target;
-
-  layer.setStyle({
-    weight: 3,
-    color: "#ff0000",
-    fillOpacity: 0.7
-  });
-
-  layer.bringToFront();
-}
-
-// RESET STYLE
-function resetHighlight(e) {
-  geojson.resetStyle(e.target);
-}
-
-// POPUP
-function onEachFeature(feature, layer) {
-
-  layer.on({
-    click: highlightFeature
-  });
-
-  layer.bindPopup(
-    "<b>Desa:</b> " + feature.properties.DESA +
-    "<br><b>Kecamatan:</b> " + feature.properties.KECAMATAN +
-    "<br><hr>" +
-    "<b>RTLH 2021:</b> " + feature.properties["RTLH 2021"] +
-    "<br><b>RTLH 2022:</b> " + feature.properties["RTLH 2022"] +
-    "<br><b>RTLH 2024:</b> " + feature.properties["RTLH 2024"] +
-    "<br><b>RTLH 2025:</b> " + feature.properties["RTLH 2025"]
-  );
-}
-
-// LOAD GEOJSON
 fetch("DATA BSPS DAN RTLH.geojson")
-.then(res => res.json())
-.then(data => {
-
-  geojson = L.geoJSON(data, {
-    style: style,
-    onEachFeature: onEachFeature
+.then(res=>res.json())
+.then(data=>{
+  var geojson = L.geoJSON(data,{
+    onEachFeature:function(feature,layer){
+      layer.bindPopup("<b>Desa :</b> "+feature.properties.DESA);
+    }
   }).addTo(map);
 
   map.fitBounds(geojson.getBounds());
-
 });
 </script>
 
