@@ -212,7 +212,12 @@ resetHighlight();
 
 geoLayer.eachLayer(l => {
 
-if (l.feature.properties.DESA === this.value) {
+let [desaNama, desaKec] = this.value.split("|");
+
+if(
+l.feature.properties.DESA === desaNama &&
+l.feature.properties.KECAMATAN === desaKec
+) {
 
 highlight(l);
 
