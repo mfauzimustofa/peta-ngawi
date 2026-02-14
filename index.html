@@ -8,9 +8,17 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <style>
-html,body{height:100%;margin:0;font-family:Segoe UI;}
-#map{height:100vh;}
+html,body{
+height:100%;
+margin:0;
+font-family:Segoe UI;
+}
 
+#map{
+height:100vh;
+}
+
+/* PANEL ATAS */
 .topbar{
 position:absolute;
 top:15px;
@@ -23,11 +31,23 @@ box-shadow:0 4px 12px rgba(0,0,0,0.25);
 width:340px;
 }
 
-.filter-row{display:flex;gap:8px;}
-select{flex:1;padding:6px;border-radius:6px;border:1px solid #ccc;}
+.filter-row{
+display:flex;
+gap:8px;
+}
 
-.slider-row{margin-top:6px;}
+select{
+flex:1;
+padding:6px;
+border-radius:6px;
+border:1px solid #ccc;
+}
 
+.slider-row{
+margin-top:6px;
+}
+
+/* LABEL PETA */
 .label-jumlah{
 font-size:11px;
 font-weight:bold;
@@ -35,6 +55,16 @@ line-height:1.2;
 text-align:center;
 color:#000;
 text-shadow:0 0 3px #fff;
+}
+
+.leaflet-top.leaflet-left{
+top:120px;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.filter-row{flex-direction:column;}
+.topbar{left:10px;right:10px;width:auto;}
 }
 </style>
 
@@ -44,6 +74,7 @@ text-shadow:0 0 3px #fff;
 <div id="map"></div>
 
 <div class="topbar">
+
   <div class="filter-row">
     <select id="jenis">
       <option value="RTLH">RTLH</option>
@@ -60,5 +91,14 @@ text-shadow:0 0 3px #fff;
   </div>
 
   <div class="slider-row">
-    <span id="labelTahun">2025</span>
-</html
+    <span id="labelTahun">2025</span><br>
+    <input type="range" id="tahun" min="2021" max="2025" value="2025">
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
