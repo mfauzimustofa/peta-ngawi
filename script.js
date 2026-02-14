@@ -20,7 +20,7 @@ let dataDesaPerKecamatan={};
 
 labelTahun.innerHTML=tahun.value;
 
-/* WARNA */
+/* ================= WARNA ================= */
 function getColor(d){
 return d>50?'#084594':
 d>30?'#2171b5':
@@ -41,7 +41,7 @@ fillOpacity:0.7
 };
 }
 
-/* HIGHLIGHT */
+/* ================= HIGHLIGHT ================= */
 function resetHighlight(){
 highlighted.forEach(l=>geoLayer.resetStyle(l));
 highlighted=[];
@@ -56,8 +56,9 @@ dashArray:"6,6"
 highlighted.push(layer);
 }
 
-/* POPUP */
+/* ================= POPUP ================= */
 function popupContent(f){
+
 let thn=tahun.value;
 
 return `
@@ -69,10 +70,24 @@ BSPS ${thn} : <b>${f.properties["BSPS "+thn]||0}</b>
 `;
 }
 
-/* LABEL */
+/* 🔥 UPDATE POPUP OTOMATIS */
+function updatePopupContent(){
+
+if(!map._popup) return;
+
+let layer = map._popup._source;
+
+if(layer && layer.feature){
+layer.setPopupContent(popupContent(layer.feature));
+}
+
+}
+
+/* ================= LABEL ================= */
 function updateLabel(){
 
 if(labelLayer) map.removeLayer(labelLayer);
+
 labelLayer=L.layerGroup();
 
 if(map.getZoom()>=13){
@@ -107,7 +122,7 @@ labelLayer.addTo(map);
 }
 }
 
-/* LOAD GEOJSON */
+/* ================= LOAD GEOJSON ================= */
 fetch("data-bsps-rtlh.geojson")
 .then(res=>res.json())
 .then(data=>{
@@ -119,16 +134,19 @@ onEachFeature:(feature,layer)=>{
 let kec=feature.properties.KECAMATAN;
 let desa=feature.properties.DESA;
 
+/* dropdown kecamatan */
 if(!dataDesaPerKecamatan[kec]){
 dataDesaPerKecamatan[kec]=[];
 filterKecamatan.innerHTML+=`<option value="${kec}">${kec}</option>`;
 }
 
+/* simpan desa + kec */
 dataDesaPerKecamatan[kec].push({
 nama:desa,
 kec:kec
 });
 
+/* klik polygon */
 layer.on("click",()=>{
 
 resetHighlight();
@@ -151,13 +169,26 @@ updateLabel();
 
 });
 
-/* EVENT */
+/* ================= EVENT ================= */
+
 map.on("zoomend",updateLabel);
 
-jenis.onchange=()=>{geoLayer.setStyle(style);updateLabel();}
-tahun.oninput=()=>{labelTahun.innerHTML=tahun.value;geoLayer.setStyle(style);updateLabel();}
+/* 🔥 JENIS */
+jenis.onchange=()=>{
+geoLayer.setStyle(style);
+updateLabel();
+updatePopupContent();
+};
 
-/* FILTER KEC */
+/* 🔥 SLIDER TAHUN */
+tahun.oninput=()=>{
+labelTahun.innerHTML=tahun.value;
+geoLayer.setStyle(style);
+updateLabel();
+updatePopupContent();
+};
+
+/* ================= FILTER KECAMATAN ================= */
 filterKecamatan.onchange=function(){
 
 resetHighlight();
@@ -184,7 +215,7 @@ setTimeout(updateLabel,700);
 
 };
 
-/* FILTER DESA */
+/* ================= FILTER DESA ================= */
 filterDesa.onchange=function(){
 
 resetHighlight();
