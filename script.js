@@ -137,7 +137,10 @@ filterKecamatan.innerHTML += `<option value="${kec}">${kec}</option>`;
 }
 
 dataDesaPerKecamatan[kec].push(desa);
-
+nama: desa,
+kec: kec
+});
+       
 /* klik layer */
 layer.on("click", () => {
 
