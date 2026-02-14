@@ -17,6 +17,7 @@ let geoLayer;
 let labelLayer;
 let highlighted=[];
 let dataDesaPerKecamatan={};
+let initialBounds;
 
 labelTahun.innerHTML=tahun.value;
 
@@ -97,7 +98,6 @@ if(!map._popup) return;
 
 let content = map._popup.getContent();
 
-/* popup kecamatan */
 if(content.includes("KECAMATAN")){
 
 let namaKec = content.match(/KECAMATAN (.*)<\/b>/)[1];
@@ -110,10 +110,7 @@ RTLH ${tahun.value} : <b>${total.rtlh}</b><br>
 BSPS ${tahun.value} : <b>${total.bsps}</b>
 `);
 
-}
-
-/* popup desa */
-else{
+}else{
 
 let layer = map._popup._source;
 
@@ -182,7 +179,6 @@ filterKecamatan.innerHTML+=`<option value="${kec}">${kec}</option>`;
 
 dataDesaPerKecamatan[kec].push({nama:desa,kec:kec});
 
-/* klik desa */
 layer.on("click",()=>{
 
 resetHighlight();
@@ -200,8 +196,42 @@ updateLabel();
 }
 }).addTo(map);
 
-map.fitBounds(geoLayer.getBounds());
+/* SIMPAN EXTENT AWAL */
+initialBounds = geoLayer.getBounds();
+map.fitBounds(initialBounds);
 updateLabel();
+
+/* ================= CONTROL ZOOM HOME ================= */
+let zoomHome = L.control({position:'bottomleft'});
+
+zoomHome.onAdd = function(){
+
+let div = L.DomUtil.create('div','leaflet-bar leaflet-control');
+
+div.innerHTML = '🏠';
+div.style.background = 'white';
+div.style.width = '34px';
+div.style.height = '34px';
+div.style.lineHeight = '34px';
+div.style.textAlign = 'center';
+div.style.cursor = 'pointer';
+div.title = "Kembali ke tampilan awal";
+
+div.onclick = function(){
+
+map.fitBounds(initialBounds);
+resetHighlight();
+map.closePopup();
+
+filterKecamatan.value="";
+filterDesa.innerHTML='<option value="">Pilih Desa</option>';
+
+};
+
+return div;
+};
+
+zoomHome.addTo(map);
 
 });
 
