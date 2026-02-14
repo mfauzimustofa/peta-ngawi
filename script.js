@@ -194,7 +194,10 @@ layers.push(l);
 });
 
 dataDesaPerKecamatan[this.value].forEach(d => {
-filterDesa.innerHTML += `<option value="${d}">${d}</option>`;
+filterDesa.innerHTML += `
+<option value="${d.nama}|${d.kec}">
+${d.nama}
+</option>`;filterDesa.innerHTML += `<option value="${d}">${d}</option>`;
 });
 
 map.flyToBounds(L.featureGroup(layers).getBounds(), { duration: 0.7 });
