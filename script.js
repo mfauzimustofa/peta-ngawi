@@ -56,7 +56,27 @@ dashArray:"6,6"
 highlighted.push(layer);
 }
 
-/* ================= POPUP ================= */
+/* ================= HITUNG TOTAL KECAMATAN ================= */
+function getTotalKecamatan(namaKecamatan){
+
+let totalRTLH = 0;
+let totalBSPS = 0;
+
+geoLayer.eachLayer(l=>{
+
+if(l.feature.properties.KECAMATAN === namaKecamatan){
+
+totalRTLH += l.feature.properties["RTLH "+tahun.value] || 0;
+totalBSPS += l.feature.properties["BSPS "+tahun.value] || 0;
+
+}
+
+});
+
+return {rtlh:totalRTLH, bsps:totalBSPS};
+}
+
+/* ================= POPUP DESA ================= */
 function popupContent(f){
 
 let thn=tahun.value;
@@ -70,10 +90,30 @@ BSPS ${thn} : <b>${f.properties["BSPS "+thn]||0}</b>
 `;
 }
 
-/* 🔥 UPDATE POPUP OTOMATIS */
+/* ================= UPDATE POPUP OTOMATIS ================= */
 function updatePopupContent(){
 
 if(!map._popup) return;
+
+let content = map._popup.getContent();
+
+/* popup kecamatan */
+if(content.includes("KECAMATAN")){
+
+let namaKec = content.match(/KECAMATAN (.*)<\/b>/)[1];
+let total = getTotalKecamatan(namaKec);
+
+map._popup.setContent(`
+<b>KECAMATAN ${namaKec}</b>
+<hr>
+RTLH ${tahun.value} : <b>${total.rtlh}</b><br>
+BSPS ${tahun.value} : <b>${total.bsps}</b>
+`);
+
+}
+
+/* popup desa */
+else{
 
 let layer = map._popup._source;
 
@@ -83,11 +123,12 @@ layer.setPopupContent(popupContent(layer.feature));
 
 }
 
+}
+
 /* ================= LABEL ================= */
 function updateLabel(){
 
 if(labelLayer) map.removeLayer(labelLayer);
-
 labelLayer=L.layerGroup();
 
 if(map.getZoom()>=13){
@@ -134,19 +175,14 @@ onEachFeature:(feature,layer)=>{
 let kec=feature.properties.KECAMATAN;
 let desa=feature.properties.DESA;
 
-/* dropdown kecamatan */
 if(!dataDesaPerKecamatan[kec]){
 dataDesaPerKecamatan[kec]=[];
 filterKecamatan.innerHTML+=`<option value="${kec}">${kec}</option>`;
 }
 
-/* simpan desa + kec */
-dataDesaPerKecamatan[kec].push({
-nama:desa,
-kec:kec
-});
+dataDesaPerKecamatan[kec].push({nama:desa,kec:kec});
 
-/* klik polygon */
+/* klik desa */
 layer.on("click",()=>{
 
 resetHighlight();
@@ -173,14 +209,12 @@ updateLabel();
 
 map.on("zoomend",updateLabel);
 
-/* 🔥 JENIS */
 jenis.onchange=()=>{
 geoLayer.setStyle(style);
 updateLabel();
 updatePopupContent();
 };
 
-/* 🔥 SLIDER TAHUN */
 tahun.oninput=()=>{
 labelTahun.innerHTML=tahun.value;
 geoLayer.setStyle(style);
@@ -195,23 +229,42 @@ resetHighlight();
 filterDesa.innerHTML='<option value="">Pilih Desa</option>';
 
 let layers=[];
+let namaKec=this.value;
 
 geoLayer.eachLayer(l=>{
-if(l.feature.properties.KECAMATAN===this.value){
+if(l.feature.properties.KECAMATAN===namaKec){
 highlight(l);
 layers.push(l);
 }
 });
 
-dataDesaPerKecamatan[this.value].forEach(d=>{
+let total=getTotalKecamatan(namaKec);
+
+dataDesaPerKecamatan[namaKec].forEach(d=>{
 filterDesa.innerHTML+=`
 <option value="${d.nama}|${d.kec}">
 ${d.nama} (${d.kec})
 </option>`;
 });
 
-map.flyToBounds(L.featureGroup(layers).getBounds(),{duration:0.7});
-setTimeout(updateLabel,700);
+let bounds=L.featureGroup(layers).getBounds();
+map.flyToBounds(bounds,{duration:0.7});
+
+setTimeout(()=>{
+
+L.popup()
+.setLatLng(bounds.getCenter())
+.setContent(`
+<b>KECAMATAN ${namaKec}</b>
+<hr>
+RTLH ${tahun.value} : <b>${total.rtlh}</b><br>
+BSPS ${tahun.value} : <b>${total.bsps}</b>
+`)
+.openOn(map);
+
+updateLabel();
+
+},700);
 
 };
 
