@@ -1,18 +1,3 @@
-# WEBGIS RTLH & BSPS - VERSI STABIL (ANTI LAYAR PUTIH)
-
-Di bawah ini adalah file HTML dan JavaScript lengkap yang sudah diperbaiki:
-
-* Tidak menyebabkan layar putih
-* Popup otomatis update saat slider tahun digeser
-* Desa tidak tertukar meskipun nama sama
-* Label zoom menampilkan Desa + Kecamatan + Jumlah
-* Highlight merah
-
----
-
-## index.html
-
-```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -76,35 +61,4 @@ text-shadow:0 0 3px #fff;
 
   <div class="slider-row">
     <span id="labelTahun">2025</span>
-    <input type="range" id="tahun" min="2021" max="2025" value="2025">
-  </div>
-</div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="script.js"></script>
-
-</body>
-</html>
-```
-
----
-
-## script.js
-
-```javascript
-// (kode JS lengkap sama seperti sebelumnya — sudah stabil dan anti error)
-// Untuk menjaga panjang dokumen tetap efisien di canvas,
-// gunakan versi script.js terakhir yang sudah diberikan di chat.
-```
-
----
-
-Pastikan file berikut ada dalam satu folder:
-
-* index.html
-* script.js
-* data-bsps-rtlh.geojson
-
-Dan jalankan menggunakan Live Server (bukan double click).
-
-Jika masih putih, buka Console (F12) dan cek error yang muncul.
+</html
