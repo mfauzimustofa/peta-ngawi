@@ -8,10 +8,12 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
 const tahun = document.getElementById("tahun");
 const labelTahun = document.getElementById("labelTahun");
+const prev = document.getElementById("prevTahun");
+const next = document.getElementById("nextTahun");
 const kecSelect = document.getElementById("kecamatan");
 const desaSelect = document.getElementById("desa");
 
-labelTahun.innerHTML = tahun.value;
+labelTahun.textContent = tahun.value;
 
 let geoLayer, geoData;
 
@@ -53,33 +55,25 @@ geoData = data;
 geoLayer = L.geoJSON(data,{
 style:style,
 onEachFeature:(feature,layer)=>{
-
 layer.bindPopup(`
 <b>Desa:</b> ${feature.properties[FIELD_DESA]}<br>
 <b>Kecamatan:</b> ${feature.properties[FIELD_KEC]}<br>
 <b>Jumlah:</b> ${feature.properties["RTLH "+tahun.value] || 0}
 `);
-
 }
 }).addTo(map);
 
 map.fitBounds(geoLayer.getBounds());
 
 isiKecamatan();
-
 });
 
-/* ISI KECAMATAN */
+/* DROPDOWN KECAMATAN */
 function isiKecamatan(){
-
-let kecamatan = [...new Set(
-geoData.features.map(f=>f.properties[FIELD_KEC])
-)].sort();
-
+let kecamatan = [...new Set(geoData.features.map(f=>f.properties[FIELD_KEC]))].sort();
 kecamatan.forEach(k=>{
 kecSelect.innerHTML += `<option value="${k}">${k}</option>`;
 });
-
 }
 
 /* FILTER KECAMATAN */
@@ -93,9 +87,7 @@ map.fitBounds(geoLayer.getBounds());
 return;
 }
 
-let filtered = geoData.features.filter(
-f=>f.properties[FIELD_KEC]==this.value
-);
+let filtered = geoData.features.filter(f=>f.properties[FIELD_KEC]==this.value);
 
 map.fitBounds(L.geoJSON(filtered).getBounds());
 
@@ -105,19 +97,15 @@ highlight(layer);
 }
 });
 
-let desaList = [...new Set(
-filtered.map(f=>f.properties[FIELD_DESA])
-)].sort();
+let desaList = [...new Set(filtered.map(f=>f.properties[FIELD_DESA]))].sort();
 
 desaList.forEach(d=>{
 desaSelect.innerHTML += `<option value="${d}">${d}</option>`;
 });
-
 };
 
 /* FILTER DESA */
 desaSelect.onchange=function(){
-
 geoLayer.resetStyle();
 
 geoLayer.eachLayer(layer=>{
@@ -126,16 +114,38 @@ highlight(layer);
 map.fitBounds(layer.getBounds());
 }
 });
-
 };
 
-/* TAHUN */
-tahun.oninput=function(){
+/* UPDATE TAHUN */
+function updateTahun(){
 
-labelTahun.innerHTML=tahun.value;
+if(!geoLayer) return;
+
+labelTahun.textContent = tahun.value;
 
 geoLayer.setStyle(style);
 
-};
+geoLayer.eachLayer(layer=>{
+layer.setPopupContent(`
+<b>Desa:</b> ${layer.feature.properties[FIELD_DESA]}<br>
+<b>Kecamatan:</b> ${layer.feature.properties[FIELD_KEC]}<br>
+<b>Jumlah:</b> ${layer.feature.properties["RTLH "+tahun.value] || 0}
+`);
+});
+}
+
+/* SLIDER */
+tahun.addEventListener("input", updateTahun);
+
+/* TOMBOL */
+prev.addEventListener("click", ()=>{
+tahun.stepDown();
+updateTahun();
+});
+
+next.addEventListener("click", ()=>{
+tahun.stepUp();
+updateTahun();
+});
 
 });
