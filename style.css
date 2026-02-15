@@ -1,33 +1,70 @@
-html,body{height:100%;margin:0;font-family:Segoe UI;}
-#map{height:100vh;}
+html,body{
+height:100%;
+margin:0;
+font-family:Segoe UI;
+}
 
+#map{
+height:100vh;
+}
+
+/* PANEL */
 .topbar{
 position:absolute;
 top:15px;
 left:15px;
 z-index:1000;
 background:#fff;
-padding:12px;
-border-radius:12px;
+padding:14px;
+border-radius:14px;
 box-shadow:0 4px 12px rgba(0,0,0,0.25);
-width:340px;
+width:420px;
+max-width:95%;
 }
 
-.filter-row{display:flex;gap:8px;}
-select{flex:1;padding:6px;border-radius:6px;border:1px solid #ccc;}
+/* DESKTOP GRID */
+.filter-row{
+display:grid;
+grid-template-columns:120px 130px 1fr;
+gap:8px;
+}
 
-.slider-row{margin-top:6px;}
+/* DROPDOWN */
+select{
+width:100%;
+padding:6px;
+border-radius:6px;
+border:1px solid #ccc;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
 
-.label-jumlah{
-font-size:11px;
+/* SLIDER */
+.slider-row{
+margin-top:10px;
+}
+
+.tahun-label{
 font-weight:bold;
-color:#000;
-text-shadow:0 0 3px #fff;
+margin-bottom:4px;
 }
 
-.leaflet-top.leaflet-left{top:120px;}
+input[type=range]{
+width:100%;
+}
 
+/* MOBILE */
 @media(max-width:768px){
-.filter-row{flex-direction:column;}
-.topbar{left:10px;right:10px;width:auto;}
+
+.topbar{
+left:10px;
+right:10px;
+width:auto;
+}
+
+.filter-row{
+grid-template-columns:1fr;
+}
+
 }
