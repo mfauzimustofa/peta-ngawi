@@ -22,14 +22,13 @@ width:420px;
 max-width:95%;
 }
 
-/* DESKTOP GRID */
+/* DROPDOWN */
 .filter-row{
 display:grid;
 grid-template-columns:120px 130px 1fr;
 gap:8px;
 }
 
-/* DROPDOWN */
 select{
 width:100%;
 padding:6px;
@@ -40,31 +39,58 @@ overflow:hidden;
 text-overflow:ellipsis;
 }
 
-/* SLIDER */
+/* SLIDER AREA */
 .slider-row{
+display:flex;
+align-items:center;
+gap:10px;
 margin-top:10px;
 }
 
-.tahun-label{
+/* TOMBOL PANAH */
+.navTahun{
+background:#fff;
+border:1px solid #ccc;
+border-radius:8px;
+width:34px;
+height:34px;
+cursor:pointer;
 font-weight:bold;
+font-size:16px;
+}
+
+.navTahun:disabled{
+opacity:0.3;
+cursor:not-allowed;
+}
+
+/* CONTAINER TAHUN */
+.tahun-container{
+flex:1;
+text-align:center;
+}
+
+#labelTahun{
+font-weight:bold;
+font-size:18px;
 margin-bottom:4px;
 }
 
-input[type=range]{
+#tahun{
 width:100%;
 }
 
 /* MOBILE */
 @media(max-width:768px){
 
+.filter-row{
+grid-template-columns:1fr;
+}
+
 .topbar{
 left:10px;
 right:10px;
 width:auto;
-}
-
-.filter-row{
-grid-template-columns:1fr;
 }
 
 }
