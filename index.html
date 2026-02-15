@@ -16,30 +16,26 @@
 <div class="topbar">
 
   <div class="filter-row">
-    <select>
-      <option>RTLH</option>
-      <option>BSPS</option>
+    <select id="jenis">
+      <option value="RTLH">RTLH</option>
+      <option value="BSPS">BSPS</option>
     </select>
 
-    <select>
-      <option>Semua Kecamatan</option>
-    </select>
-
-    <select>
-      <option>Semua Desa</option>
-    </select>
+    <select id="kecamatan"></select>
+    <select id="desa"></select>
   </div>
 
   <div class="slider-row">
 
-    <button id="prevTahun" class="navTahun">&lt;</button>
+    <div class="tahun-nav">
 
-    <div class="tahun-container">
-      <div id="labelTahun">2022</div>
-      <input type="range" id="tahun" min="2022" max="2025" value="2022">
+      <button id="prevTahun">&lt;</button>
+      <span id="labelTahun">2025</span>
+      <button id="nextTahun">&gt;</button>
+
     </div>
 
-    <button id="nextTahun" class="navTahun">&gt;</button>
+    <input type="range" id="tahun" min="2022" max="2025" value="2025">
 
   </div>
 
