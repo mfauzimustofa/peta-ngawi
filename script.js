@@ -6,7 +6,12 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
 attribution:"© OpenStreetMap"
 }).addTo(map);
 
+/* RANGE TAHUN */
 const tahun = document.getElementById("tahun");
+tahun.min = 2021;
+tahun.max = 2025;
+tahun.value = 2025;
+
 const labelTahun = document.getElementById("labelTahun");
 const prev = document.getElementById("prevTahun");
 const next = document.getElementById("nextTahun");
@@ -14,6 +19,7 @@ const next = document.getElementById("nextTahun");
 labelTahun.innerHTML = tahun.value;
 
 let geoLayer;
+let geoData;
 
 /* WARNA */
 function getColor(d){
@@ -24,13 +30,13 @@ d>10?'#6baed6':
 d>0?'#9ecae1':'#f1f1f1';
 }
 
+/* STYLE DINAMIS */
 function style(feature){
 
 let field = "RTLH " + tahun.value;
 
-/* CEK FIELD ADA ATAU TIDAK */
-if(!feature.properties[field]){
-console.log("Field tidak ada:",field);
+if(!(field in feature.properties)){
+console.log("FIELD TIDAK ADA:",field);
 }
 
 let value = feature.properties[field] || 0;
@@ -43,17 +49,14 @@ fillOpacity:0.7
 };
 }
 
-function loadData(){
-
-if(geoLayer) map.removeLayer(geoLayer);
-
+/* LOAD GEOJSON SEKALI SAJA */
 fetch("data.geojson")
 .then(res=>res.json())
 .then(data=>{
 
-console.log("GeoJSON berhasil load");
+geoData = data;
 
-geoLayer = L.geoJSON(data,{
+geoLayer = L.geoJSON(geoData,{
 style:style,
 onEachFeature:(feature,layer)=>{
 
@@ -63,7 +66,6 @@ let kec = feature.properties.Kecamatan || feature.properties.kecamatan || "-";
 layer.bindPopup(
 "<b>Desa:</b> "+desa+"<br><b>Kecamatan:</b> "+kec
 );
-
 }
 }).addTo(map);
 
@@ -71,28 +73,26 @@ map.fitBounds(geoLayer.getBounds());
 
 })
 .catch(err=>{
-console.log("GeoJSON gagal:",err);
+console.log("Gagal load geojson:",err);
 });
+
+/* UPDATE STYLE TANPA RELOAD LAYER */
+function updateMap(){
+labelTahun.innerHTML = tahun.value;
+geoLayer.setStyle(style);
 }
 
 /* EVENT */
-tahun.addEventListener("input",()=>{
-labelTahun.innerHTML = tahun.value;
-loadData();
-});
+tahun.addEventListener("input",updateMap);
 
 prev.onclick=()=>{
 tahun.stepDown();
-labelTahun.innerHTML = tahun.value;
-loadData();
+updateMap();
 };
 
 next.onclick=()=>{
 tahun.stepUp();
-labelTahun.innerHTML = tahun.value;
-loadData();
+updateMap();
 };
-
-loadData();
 
 });
