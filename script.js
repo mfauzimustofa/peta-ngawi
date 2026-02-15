@@ -50,7 +50,7 @@ fillOpacity:0.7
 }
 
 /* LOAD GEOJSON SEKALI SAJA */
-fetch("data.geojson")
+fetch("data-bsps-rtlh.geojson")
 .then(res=>res.json())
 .then(data=>{
 
