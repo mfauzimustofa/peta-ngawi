@@ -2,8 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 const map = L.map("map");
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
-.addTo(map);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+attribution:"© OpenStreetMap"
+}).addTo(map);
 
 const tahun = document.getElementById("tahun");
 const labelTahun = document.getElementById("labelTahun");
@@ -35,7 +36,7 @@ fillOpacity:0.7
 };
 }
 
-/* LOAD DATA */
+/* LOAD GEOJSON */
 function loadData(){
 
 if(geoLayer) map.removeLayer(geoLayer);
@@ -45,14 +46,22 @@ fetch("data.geojson")
 .then(data=>{
 
 geoLayer = L.geoJSON(data,{
-style:style
+style:style,
+onEachFeature:(feature,layer)=>{
+layer.bindPopup(feature.properties.Desa || "Tanpa nama");
+}
 }).addTo(map);
 
-/* ZOOM TO LAYER SAAT PERTAMA */
+/* ZOOM KE LAYER */
 map.fitBounds(geoLayer.getBounds());
 
-});
+})
+.catch(err=>{
+console.log("GeoJSON gagal load:",err);
 
+/* fallback biar peta tetap tampil */
+map.setView([-7.4,111.4],11);
+});
 }
 
 /* SLIDER */
