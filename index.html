@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<title>WebGIS RTLH BSPS</title>
+<title>WebGIS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
@@ -14,34 +14,21 @@
 <div id="map"></div>
 
 <div class="topbar">
+  <select>
+    <option>RTLH</option>
+  </select>
 
-  <div class="filter-row">
-    <select id="jenis">
-      <option value="RTLH">RTLH</option>
-      <option value="BSPS">BSPS</option>
-    </select>
+  <select>
+    <option>Semua Kecamatan</option>
+  </select>
 
-    <select id="kecamatan"></select>
-    <select id="desa"></select>
-  </div>
-
-  <div class="slider-row">
-
-    <div class="tahun-nav">
-
-      <button id="prevTahun">&lt;</button>
-      <span id="labelTahun">2025</span>
-      <button id="nextTahun">&gt;</button>
-
-    </div>
-
-    <input type="range" id="tahun" min="2022" max="2025" value="2025">
-
-  </div>
-
+  <select>
+    <option>Semua Desa</option>
+  </select>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
