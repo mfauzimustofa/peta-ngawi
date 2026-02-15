@@ -1,11 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-const map = L.map("map");
+/* ================= BASEMAP ================= */
+const map = L.map("map").setView([-7.4,111.4],11);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
 attribution:"© OpenStreetMap"
 }).addTo(map);
 
+/* ================= TAHUN ================= */
 const tahun = document.getElementById("tahun");
 const labelTahun = document.getElementById("labelTahun");
 const prev = document.getElementById("prevTahun");
@@ -15,7 +17,7 @@ labelTahun.innerHTML = tahun.value;
 
 let geoLayer;
 
-/* WARNA */
+/* ================= WARNA ================= */
 function getColor(d){
 return d>50?'#084594':
 d>30?'#2171b5':
@@ -36,7 +38,7 @@ fillOpacity:0.7
 };
 }
 
-/* LOAD GEOJSON */
+/* ================= LOAD DATA ================= */
 function loadData(){
 
 if(geoLayer) map.removeLayer(geoLayer);
@@ -48,7 +50,10 @@ fetch("data.geojson")
 geoLayer = L.geoJSON(data,{
 style:style,
 onEachFeature:(feature,layer)=>{
-layer.bindPopup(feature.properties.Desa || "Tanpa nama");
+layer.bindPopup(
+"<b>Desa :</b> " + feature.properties.Desa +
+"<br><b>Kecamatan :</b> " + feature.properties.Kecamatan
+);
 }
 }).addTo(map);
 
@@ -57,20 +62,16 @@ map.fitBounds(geoLayer.getBounds());
 
 })
 .catch(err=>{
-console.log("GeoJSON gagal load:",err);
-
-/* fallback biar peta tetap tampil */
-map.setView([-7.4,111.4],11);
+console.log("GeoJSON gagal:",err);
 });
 }
 
-/* SLIDER */
+/* ================= EVENT ================= */
 tahun.addEventListener("input",()=>{
 labelTahun.innerHTML = tahun.value;
 loadData();
 });
 
-/* TOMBOL TAHUN */
 prev.onclick=()=>{
 if(tahun.value > tahun.min){
 tahun.value--;
