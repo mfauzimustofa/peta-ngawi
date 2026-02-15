@@ -1,18 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-const map = L.map("map").setView([-7.4,111.4],11);
+const map = L.map("map");
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
 attribution:"© OpenStreetMap"
 }).addTo(map);
 
-/* RANGE TAHUN */
 const tahun = document.getElementById("tahun");
-tahun.min = 2021;
-tahun.max = 2025;
-tahun.value = 2025;
-
 const labelTahun = document.getElementById("labelTahun");
+const kecSelect = document.getElementById("kecamatan");
+const desaSelect = document.getElementById("desa");
 const prev = document.getElementById("prevTahun");
 const next = document.getElementById("nextTahun");
 
@@ -30,27 +27,29 @@ d>10?'#6baed6':
 d>0?'#9ecae1':'#f1f1f1';
 }
 
-/* STYLE DINAMIS */
 function style(feature){
-
-let field = "RTLH " + tahun.value;
-
-if(!(field in feature.properties)){
-console.log("FIELD TIDAK ADA:",field);
-}
-
-let value = feature.properties[field] || 0;
+let value = feature.properties["RTLH " + tahun.value] || 0;
 
 return{
 fillColor:getColor(value),
 weight:1,
-color:"#444",
+color:"#666",
 fillOpacity:0.7
 };
 }
 
-/* LOAD GEOJSON SEKALI SAJA */
-fetch("data-bsps-rtlh.geojson")
+/* HIGHLIGHT */
+function highlight(layer){
+layer.setStyle({
+color:"red",
+weight:3,
+dashArray:"5,5",
+fillOpacity:0.9
+});
+}
+
+/* LOAD GEOJSON */
+fetch("./data-bsps-rtlh.geojson")
 .then(res=>res.json())
 .then(data=>{
 
@@ -60,39 +59,96 @@ geoLayer = L.geoJSON(geoData,{
 style:style,
 onEachFeature:(feature,layer)=>{
 
-let desa = feature.properties.Desa || feature.properties.desa || "-";
-let kec = feature.properties.Kecamatan || feature.properties.kecamatan || "-";
-
 layer.bindPopup(
-"<b>Desa:</b> "+desa+"<br><b>Kecamatan:</b> "+kec
+"<b>Desa:</b> "+feature.properties.WADMKD+
+"<br><b>Kecamatan:</b> "+feature.properties.WADMKC+
+"<br><b>Jumlah:</b> "+(feature.properties["RTLH "+tahun.value]||0)
 );
+
 }
 }).addTo(map);
 
 map.fitBounds(geoLayer.getBounds());
 
-})
-.catch(err=>{
-console.log("Gagal load geojson:",err);
+isiDropdown();
+
 });
 
-/* UPDATE STYLE TANPA RELOAD LAYER */
-function updateMap(){
-labelTahun.innerHTML = tahun.value;
-geoLayer.setStyle(style);
+/* DROPDOWN KECAMATAN */
+function isiDropdown(){
+
+let kecamatan = [...new Set(geoData.features.map(f=>f.properties.WADMKC))].sort();
+
+kecamatan.forEach(k=>{
+kecSelect.innerHTML += `<option value="${k}">${k}</option>`;
+});
+
 }
 
-/* EVENT */
-tahun.addEventListener("input",updateMap);
+/* FILTER KECAMATAN */
+kecSelect.onchange=function(){
 
-prev.onclick=()=>{
-tahun.stepDown();
-updateMap();
+desaSelect.innerHTML=`<option value="">Semua Desa</option>`;
+geoLayer.resetStyle();
+
+if(!this.value){
+map.fitBounds(geoLayer.getBounds());
+return;
+}
+
+let filtered = geoData.features.filter(f=>f.properties.WADMKC==this.value);
+
+let bounds = L.geoJSON(filtered).getBounds();
+map.fitBounds(bounds);
+
+geoLayer.eachLayer(layer=>{
+if(layer.feature.properties.WADMKC==this.value){
+highlight(layer);
+}
+});
+
+/* ISI DESA */
+let desaList = [...new Set(filtered.map(f=>f.properties.WADMKD))].sort();
+
+desaList.forEach(d=>{
+desaSelect.innerHTML += `<option value="${d}">${d}</option>`;
+});
+
 };
 
-next.onclick=()=>{
-tahun.stepUp();
-updateMap();
+/* FILTER DESA */
+desaSelect.onchange=function(){
+
+geoLayer.resetStyle();
+
+geoLayer.eachLayer(layer=>{
+if(layer.feature.properties.WADMKD==this.value){
+highlight(layer);
+map.fitBounds(layer.getBounds());
+}
+});
+
 };
+
+/* TAHUN */
+tahun.oninput=function(){
+
+labelTahun.innerHTML=tahun.value;
+
+geoLayer.setStyle(style);
+
+geoLayer.eachLayer(layer=>{
+layer.setPopupContent(
+"<b>Desa:</b> "+layer.feature.properties.WADMKD+
+"<br><b>Kecamatan:</b> "+layer.feature.properties.WADMKC+
+"<br><b>Jumlah:</b> "+(layer.feature.properties["RTLH "+tahun.value]||0)
+);
+});
+
+};
+
+/* TOMBOL TAHUN */
+prev.onclick=()=>{tahun.stepDown();tahun.oninput();}
+next.onclick=()=>{tahun.stepUp();tahun.oninput();}
 
 });
