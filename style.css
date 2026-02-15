@@ -7,7 +7,6 @@ font-family:Segoe UI;
 #map{
 height:100vh;
 width:100%;
-z-index:1;
 }
 
 /* PANEL */
@@ -16,7 +15,7 @@ position:absolute;
 top:15px;
 left:15px;
 z-index:9999;
-background:#fff;
+background:white;
 padding:14px;
 border-radius:14px;
 box-shadow:0 4px 12px rgba(0,0,0,0.25);
@@ -24,7 +23,6 @@ width:420px;
 max-width:95%;
 }
 
-/* FILTER */
 .filter-row{
 display:grid;
 grid-template-columns:120px 1fr 1fr;
@@ -33,18 +31,18 @@ margin-bottom:10px;
 }
 
 select{
-width:100%;
 padding:6px;
 border-radius:6px;
 border:1px solid #ccc;
+width:100%;
 }
 
-/* TAHUN */
+/* SLIDER */
 .tahun-nav{
 display:flex;
 justify-content:center;
 align-items:center;
-gap:12px;
+gap:10px;
 font-weight:bold;
 font-size:18px;
 margin-bottom:6px;
@@ -52,7 +50,7 @@ margin-bottom:6px;
 
 .tahun-nav button{
 border:1px solid #ccc;
-background:#fff;
+background:white;
 border-radius:6px;
 padding:4px 10px;
 cursor:pointer;
