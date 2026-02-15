@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<title>WEBGIS RTLH & BSPS Kabupaten Ngawi</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8">
+<title>WebGIS RTLH BSPS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<link rel="stylesheet" href="style.css"/>
-
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <div id="map"></div>
@@ -16,31 +16,36 @@
 <div class="topbar">
 
   <div class="filter-row">
-    <select id="jenis">
-      <option value="RTLH">RTLH</option>
-      <option value="BSPS">BSPS</option>
+    <select>
+      <option>RTLH</option>
+      <option>BSPS</option>
     </select>
 
-    <select id="filterKecamatan">
-      <option value="">Semua Kecamatan</option>
+    <select>
+      <option>Semua Kecamatan</option>
     </select>
 
-    <select id="filterDesa">
-      <option value="">Semua Desa</option>
+    <select>
+      <option>Semua Desa</option>
     </select>
   </div>
 
   <div class="slider-row">
-    <div class="tahun-label">
-      <span id="labelTahun">2025</span>
+
+    <button id="prevTahun" class="navTahun">&lt;</button>
+
+    <div class="tahun-container">
+      <div id="labelTahun">2022</div>
+      <input type="range" id="tahun" min="2022" max="2025" value="2022">
     </div>
-    <input type="range" id="tahun" min="2022" max="2025" value="2025"/>
+
+    <button id="nextTahun" class="navTahun">&gt;</button>
+
   </div>
 
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
