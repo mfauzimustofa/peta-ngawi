@@ -1,22 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-const map = L.map("map");
+const FIELD_KEC = "KECAMATAN";
+const FIELD_DESA = "DESA";
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
-attribution:"© OpenStreetMap"
-}).addTo(map);
+const map = L.map("map");
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
 const tahun = document.getElementById("tahun");
 const labelTahun = document.getElementById("labelTahun");
 const kecSelect = document.getElementById("kecamatan");
 const desaSelect = document.getElementById("desa");
-const prev = document.getElementById("prevTahun");
-const next = document.getElementById("nextTahun");
 
 labelTahun.innerHTML = tahun.value;
 
-let geoLayer;
-let geoData;
+let geoLayer, geoData;
 
 /* WARNA */
 function getColor(d){
@@ -38,13 +35,11 @@ fillOpacity:0.7
 };
 }
 
-/* HIGHLIGHT */
 function highlight(layer){
 layer.setStyle({
 color:"red",
 weight:3,
-dashArray:"5,5",
-fillOpacity:0.9
+dashArray:"5,5"
 });
 }
 
@@ -55,29 +50,31 @@ fetch("./data-bsps-rtlh.geojson")
 
 geoData = data;
 
-geoLayer = L.geoJSON(geoData,{
+geoLayer = L.geoJSON(data,{
 style:style,
 onEachFeature:(feature,layer)=>{
 
-layer.bindPopup(
-"<b>Desa:</b> "+feature.properties.WADMKD+
-"<br><b>Kecamatan:</b> "+feature.properties.WADMKC+
-"<br><b>Jumlah:</b> "+(feature.properties["RTLH "+tahun.value]||0)
-);
+layer.bindPopup(`
+<b>Desa:</b> ${feature.properties[FIELD_DESA]}<br>
+<b>Kecamatan:</b> ${feature.properties[FIELD_KEC]}<br>
+<b>Jumlah:</b> ${feature.properties["RTLH "+tahun.value] || 0}
+`);
 
 }
 }).addTo(map);
 
 map.fitBounds(geoLayer.getBounds());
 
-isiDropdown();
+isiKecamatan();
 
 });
 
-/* DROPDOWN KECAMATAN */
-function isiDropdown(){
+/* ISI KECAMATAN */
+function isiKecamatan(){
 
-let kecamatan = [...new Set(geoData.features.map(f=>f.properties.WADMKC))].sort();
+let kecamatan = [...new Set(
+geoData.features.map(f=>f.properties[FIELD_KEC])
+)].sort();
 
 kecamatan.forEach(k=>{
 kecSelect.innerHTML += `<option value="${k}">${k}</option>`;
@@ -96,19 +93,21 @@ map.fitBounds(geoLayer.getBounds());
 return;
 }
 
-let filtered = geoData.features.filter(f=>f.properties.WADMKC==this.value);
+let filtered = geoData.features.filter(
+f=>f.properties[FIELD_KEC]==this.value
+);
 
-let bounds = L.geoJSON(filtered).getBounds();
-map.fitBounds(bounds);
+map.fitBounds(L.geoJSON(filtered).getBounds());
 
 geoLayer.eachLayer(layer=>{
-if(layer.feature.properties.WADMKC==this.value){
+if(layer.feature.properties[FIELD_KEC]==this.value){
 highlight(layer);
 }
 });
 
-/* ISI DESA */
-let desaList = [...new Set(filtered.map(f=>f.properties.WADMKD))].sort();
+let desaList = [...new Set(
+filtered.map(f=>f.properties[FIELD_DESA])
+)].sort();
 
 desaList.forEach(d=>{
 desaSelect.innerHTML += `<option value="${d}">${d}</option>`;
@@ -122,7 +121,7 @@ desaSelect.onchange=function(){
 geoLayer.resetStyle();
 
 geoLayer.eachLayer(layer=>{
-if(layer.feature.properties.WADMKD==this.value){
+if(layer.feature.properties[FIELD_DESA]==this.value){
 highlight(layer);
 map.fitBounds(layer.getBounds());
 }
@@ -137,18 +136,6 @@ labelTahun.innerHTML=tahun.value;
 
 geoLayer.setStyle(style);
 
-geoLayer.eachLayer(layer=>{
-layer.setPopupContent(
-"<b>Desa:</b> "+layer.feature.properties.WADMKD+
-"<br><b>Kecamatan:</b> "+layer.feature.properties.WADMKC+
-"<br><b>Jumlah:</b> "+(layer.feature.properties["RTLH "+tahun.value]||0)
-);
-});
-
 };
-
-/* TOMBOL TAHUN */
-prev.onclick=()=>{tahun.stepDown();tahun.oninput();}
-next.onclick=()=>{tahun.stepUp();tahun.oninput();}
 
 });
