@@ -1,13 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-/* ================= BASEMAP ================= */
 const map = L.map("map").setView([-7.4,111.4],11);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
 attribution:"© OpenStreetMap"
 }).addTo(map);
 
-/* ================= TAHUN ================= */
 const tahun = document.getElementById("tahun");
 const labelTahun = document.getElementById("labelTahun");
 const prev = document.getElementById("prevTahun");
@@ -17,7 +15,7 @@ labelTahun.innerHTML = tahun.value;
 
 let geoLayer;
 
-/* ================= WARNA ================= */
+/* WARNA */
 function getColor(d){
 return d>50?'#084594':
 d>30?'#2171b5':
@@ -27,7 +25,14 @@ d>0?'#9ecae1':'#f1f1f1';
 }
 
 function style(feature){
+
 let field = "RTLH " + tahun.value;
+
+/* CEK FIELD ADA ATAU TIDAK */
+if(!feature.properties[field]){
+console.log("Field tidak ada:",field);
+}
+
 let value = feature.properties[field] || 0;
 
 return{
@@ -38,7 +43,6 @@ fillOpacity:0.7
 };
 }
 
-/* ================= LOAD DATA ================= */
 function loadData(){
 
 if(geoLayer) map.removeLayer(geoLayer);
@@ -47,17 +51,22 @@ fetch("data.geojson")
 .then(res=>res.json())
 .then(data=>{
 
+console.log("GeoJSON berhasil load");
+
 geoLayer = L.geoJSON(data,{
 style:style,
 onEachFeature:(feature,layer)=>{
+
+let desa = feature.properties.Desa || feature.properties.desa || "-";
+let kec = feature.properties.Kecamatan || feature.properties.kecamatan || "-";
+
 layer.bindPopup(
-"<b>Desa :</b> " + feature.properties.Desa +
-"<br><b>Kecamatan :</b> " + feature.properties.Kecamatan
+"<b>Desa:</b> "+desa+"<br><b>Kecamatan:</b> "+kec
 );
+
 }
 }).addTo(map);
 
-/* ZOOM KE LAYER */
 map.fitBounds(geoLayer.getBounds());
 
 })
@@ -66,26 +75,22 @@ console.log("GeoJSON gagal:",err);
 });
 }
 
-/* ================= EVENT ================= */
+/* EVENT */
 tahun.addEventListener("input",()=>{
 labelTahun.innerHTML = tahun.value;
 loadData();
 });
 
 prev.onclick=()=>{
-if(tahun.value > tahun.min){
-tahun.value--;
+tahun.stepDown();
 labelTahun.innerHTML = tahun.value;
 loadData();
-}
 };
 
 next.onclick=()=>{
-if(tahun.value < tahun.max){
-tahun.value++;
+tahun.stepUp();
 labelTahun.innerHTML = tahun.value;
 loadData();
-}
 };
 
 loadData();
