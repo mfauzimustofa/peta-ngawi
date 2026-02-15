@@ -6,67 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<style>
-html,body{
-height:100%;
-margin:0;
-font-family:Segoe UI;
-}
-
-#map{
-height:100vh;
-}
-
-/* PANEL ATAS */
-.topbar{
-position:absolute;
-top:15px;
-left:15px;
-z-index:1000;
-background:#fff;
-padding:12px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.25);
-width:340px;
-}
-
-.filter-row{
-display:flex;
-gap:8px;
-}
-
-select{
-flex:1;
-padding:6px;
-border-radius:6px;
-border:1px solid #ccc;
-}
-
-.slider-row{
-margin-top:6px;
-}
-
-/* LABEL PETA */
-.label-jumlah{
-font-size:11px;
-font-weight:bold;
-line-height:1.2;
-text-align:center;
-color:#000;
-text-shadow:0 0 3px #fff;
-}
-
-.leaflet-top.leaflet-left{
-top:120px;
-}
-
-/* RESPONSIVE */
-@media(max-width:768px){
-.filter-row{flex-direction:column;}
-.topbar{left:10px;right:10px;width:auto;}
-}
-</style>
+<link rel="stylesheet" href="style.css"/>
 
 </head>
 <body>
@@ -82,17 +22,19 @@ top:120px;
     </select>
 
     <select id="filterKecamatan">
-      <option value="">Pilih Kecamatan</option>
+      <option value="">Semua Kecamatan</option>
     </select>
 
     <select id="filterDesa">
-      <option value="">Pilih Desa</option>
+      <option value="">Semua Desa</option>
     </select>
   </div>
 
   <div class="slider-row">
-    <span id="labelTahun">2025</span><br>
-    <input type="range" id="tahun" min="2021" max="2025" value="2025">
+    <div class="tahun-label">
+      <span id="labelTahun">2025</span>
+    </div>
+    <input type="range" id="tahun" min="2022" max="2025" value="2025"/>
   </div>
 
 </div>
