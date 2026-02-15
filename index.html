@@ -5,8 +5,56 @@
 <title>WebGIS RTLH Ngawi</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+html,body{height:100%;margin:0;font-family:Segoe UI}
+#map{height:100vh;width:100%}
+
+.topbar{
+position:absolute;
+top:15px;
+left:15px;
+z-index:9999;
+background:#fff;
+padding:14px;
+border-radius:14px;
+box-shadow:0 4px 12px rgba(0,0,0,0.25);
+width:420px;
+max-width:95%;
+}
+
+.filter-row{
+display:grid;
+grid-template-columns:120px 1fr 1fr;
+gap:8px;
+margin-bottom:10px;
+}
+
+select{
+padding:6px;
+border-radius:6px;
+border:1px solid #ccc;
+width:100%;
+}
+
+.tahun-nav{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+font-size:18px;
+font-weight:bold;
+margin-bottom:6px;
+}
+
+button{
+padding:4px 10px;
+cursor:pointer;
+}
+
+#tahun{width:100%}
+</style>
 </head>
 
 <body>
@@ -15,31 +63,18 @@
 
 <div class="topbar">
 
-  <div class="filter-row">
-    <select id="jenis">
-      <option value="RTLH">RTLH</option>
-    </select>
+<div class="filter-row">
+<select id="kecamatan"><option value="">Semua Kecamatan</option></select>
+<select id="desa"><option value="">Semua Desa</option></select>
+</div>
 
-    <select id="kecamatan">
-      <option value="">Semua Kecamatan</option>
-    </select>
+<div class="tahun-nav">
+<button type="button" id="prevTahun">&lt;</button>
+<span id="labelTahun">2025</span>
+<button type="button" id="nextTahun">&gt;</button>
+</div>
 
-    <select id="desa">
-      <option value="">Semua Desa</option>
-    </select>
-  </div>
-
-  <div class="slider-row">
-
-    <div class="tahun-nav">
-      <button id="prevTahun">&lt;</button>
-      <span id="labelTahun">2025</span>
-      <button id="nextTahun">&gt;</button>
-    </div>
-
-    <input type="range" id="tahun" min="2021" max="2025" value="2025">
-
-  </div>
+<input type="range" id="tahun" min="2021" max="2025" step="1" value="2025">
 
 </div>
 
