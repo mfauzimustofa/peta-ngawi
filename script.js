@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", function(){
+
 var map = L.map('map').setView([-7.4,111.4], 11);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -31,7 +33,7 @@ fetch("data-bsps-rtlh.geojson")
 });
 
 
-// ================= ISI DROPDOWN =================
+// ================= DROPDOWN =================
 function isiDropdown(data){
 
   let kec = new Set();
@@ -123,11 +125,9 @@ kecamatanDropdown.onchange = function(){
   let bounds = L.latLngBounds();
 
   layerDesa.eachLayer(layer=>{
-
     if(layer.feature.properties.KECAMATAN===kec){
       bounds.extend(layer.getBounds());
     }
-
   });
 
   map.fitBounds(bounds);
@@ -178,14 +178,14 @@ slider.oninput = function(){
 
 
 // ================= TOMBOL TAHUN =================
-function prevYear(){
+window.prevYear = function(){
   if(selectedTahun>2021){
     selectedTahun--;
     updateTahun();
   }
 }
 
-function nextYear(){
+window.nextYear = function(){
   if(selectedTahun<2025){
     selectedTahun++;
     updateTahun();
@@ -202,3 +202,5 @@ function updateTahun(){
     hitungKabupaten();
   }
 }
+
+});
