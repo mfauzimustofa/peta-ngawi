@@ -1,70 +1,79 @@
-html,body{
-height:100%;
-margin:0;
-font-family:Segoe UI;
+/* MAP FULL */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-#map{
-height:100vh;
-width:100%;
+#map {
+  height: 100%;
+  width: 100%;
+  position: relative;
 }
 
-.topbar{
-position:absolute;
-top:15px;
-left:15px;
-z-index:9999;
-background:white;
-padding:14px;
-border-radius:14px;
-box-shadow:0 4px 12px rgba(0,0,0,0.25);
-width:420px;
-max-width:95%;
+
+/* PANEL CONTROL ATAS (tetap seperti punyamu) */
+.control-panel {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 12px;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+
+  text-align: center;
+  font-size: 14px;
 }
 
-.filter-row{
-display:grid;
-grid-template-columns:120px 1fr 1fr;
-gap:8px;
-margin-bottom:10px;
+
+/* DROPDOWN & BUTTON */
+.control-panel select,
+.control-panel button {
+  padding: 4px 8px;
+  margin: 2px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
 }
 
-select{
-padding:6px;
-border-radius:6px;
-border:1px solid #ccc;
-width:100%;
+.control-panel input[type=range] {
+  width: 220px;
+  margin-top: 6px;
 }
 
-.tahun-nav{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:10px;
-font-weight:bold;
-font-size:18px;
-margin-bottom:6px;
+
+/* ANGKA DI TENGAH PETA */
+#map-center-info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background: rgba(255,255,255,0.92);
+  padding: 14px 26px;
+
+  border-radius: 14px;
+
+  font-size: 24px;
+  font-weight: bold;
+  color: #222;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+
+  z-index: 999;
+
+  pointer-events: none; /* supaya map tetap bisa diklik */
 }
 
-.tahun-nav button{
-border:1px solid #ccc;
-background:white;
-border-radius:6px;
-padding:4px 10px;
-cursor:pointer;
-}
 
-#tahun{
-width:100%;
-}
-
-@media(max-width:768px){
-.filter-row{
-grid-template-columns:1fr;
-}
-.topbar{
-left:10px;
-right:10px;
-width:auto;
-}
+/* BIAR LEAFLET CONTROL TIDAK KETUTUP */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 800;
 }
