@@ -6,6 +6,7 @@ const FIELD_DESA = "DESA";
 const map = L.map("map");
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
+const jenis = document.getElementById("jenis");
 const tahun = document.getElementById("tahun");
 const labelTahun = document.getElementById("labelTahun");
 const prev = document.getElementById("prevTahun");
@@ -17,6 +18,14 @@ labelTahun.textContent = tahun.value;
 
 let geoLayer, geoData;
 
+/* AMBIL NILAI DINAMIS */
+function getValue(props){
+let prefix = jenis.value;
+let f1 = prefix+" "+tahun.value;
+let f2 = prefix+"_"+tahun.value;
+return props[f1] ?? props[f2] ?? 0;
+}
+
 /* WARNA */
 function getColor(d){
 return d>50?'#084594':
@@ -27,10 +36,8 @@ d>0?'#9ecae1':'#f1f1f1';
 }
 
 function style(feature){
-let value = feature.properties["RTLH " + tahun.value] || 0;
-
 return{
-fillColor:getColor(value),
+fillColor:getColor(getValue(feature.properties)),
 weight:1,
 color:"#666",
 fillOpacity:0.7
@@ -58,7 +65,7 @@ onEachFeature:(feature,layer)=>{
 layer.bindPopup(`
 <b>Desa:</b> ${feature.properties[FIELD_DESA]}<br>
 <b>Kecamatan:</b> ${feature.properties[FIELD_KEC]}<br>
-<b>Jumlah:</b> ${feature.properties["RTLH "+tahun.value] || 0}
+<b>Jumlah:</b> ${getValue(feature.properties)}
 `);
 }
 }).addTo(map);
@@ -88,17 +95,13 @@ return;
 }
 
 let filtered = geoData.features.filter(f=>f.properties[FIELD_KEC]==this.value);
-
 map.fitBounds(L.geoJSON(filtered).getBounds());
 
 geoLayer.eachLayer(layer=>{
-if(layer.feature.properties[FIELD_KEC]==this.value){
-highlight(layer);
-}
+if(layer.feature.properties[FIELD_KEC]==this.value) highlight(layer);
 });
 
 let desaList = [...new Set(filtered.map(f=>f.properties[FIELD_DESA]))].sort();
-
 desaList.forEach(d=>{
 desaSelect.innerHTML += `<option value="${d}">${d}</option>`;
 });
@@ -107,7 +110,6 @@ desaSelect.innerHTML += `<option value="${d}">${d}</option>`;
 /* FILTER DESA */
 desaSelect.onchange=function(){
 geoLayer.resetStyle();
-
 geoLayer.eachLayer(layer=>{
 if(layer.feature.properties[FIELD_DESA]==this.value){
 highlight(layer);
@@ -116,8 +118,8 @@ map.fitBounds(layer.getBounds());
 });
 };
 
-/* UPDATE TAHUN */
-function updateTahun(){
+/* UPDATE TAHUN / JENIS */
+function updateMap(){
 
 if(!geoLayer) return;
 
@@ -129,23 +131,16 @@ geoLayer.eachLayer(layer=>{
 layer.setPopupContent(`
 <b>Desa:</b> ${layer.feature.properties[FIELD_DESA]}<br>
 <b>Kecamatan:</b> ${layer.feature.properties[FIELD_KEC]}<br>
-<b>Jumlah:</b> ${layer.feature.properties["RTLH "+tahun.value] || 0}
+<b>Jumlah:</b> ${getValue(layer.feature.properties)}
 `);
 });
 }
 
-/* SLIDER */
-tahun.addEventListener("input", updateTahun);
+/* EVENT */
+tahun.addEventListener("input", updateMap);
+jenis.addEventListener("change", updateMap);
 
-/* TOMBOL */
-prev.addEventListener("click", ()=>{
-tahun.stepDown();
-updateTahun();
-});
-
-next.addEventListener("click", ()=>{
-tahun.stepUp();
-updateTahun();
-});
+prev.onclick=()=>{tahun.stepDown();updateMap();}
+next.onclick=()=>{tahun.stepUp();updateMap();}
 
 });
