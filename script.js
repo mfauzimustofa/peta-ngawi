@@ -1,31 +1,21 @@
 var map = L.map('map').setView([-7.4,111.4], 11);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'© OpenStreetMap'
+}).addTo(map);
 
 let layerDesa;
-let allDesaFeatures;
+let dataDesa;
 
-let selectedFeatureLayer = null;
+let selectedTahun = 2025;
 
-
-// ================= LOAD GEOJSON =================
-fetch("data-bsps-rtlh.geojson")
-.then(res=>res.json())
-.then(data=>{
-
-  allDesaFeatures = data;
-
-  layerDesa = L.geoJSON(data,{
-    style: defaultStyle,
-    onEachFeature: onEachFeature
-  }).addTo(map);
-
-  isiDropdown(data);
-});
+const rtlhText = document.getElementById("rtlhCount");
+const slider = document.getElementById("tahunSlider");
+const tahunLabel = document.getElementById("tahunLabel");
 
 
 // ================= STYLE =================
-function defaultStyle(){
+function styleNormal(){
   return {
     color:"#3388ff",
     weight:1,
@@ -33,46 +23,102 @@ function defaultStyle(){
   };
 }
 
-function highlightStyle(){
+function styleHighlight(){
   return {
     color:"red",
     weight:3,
     dashArray:"5,5",
-    fillOpacity:0.1
+    fillOpacity:0.05
   };
 }
+
+
+// ================= LOAD GEOJSON =================
+fetch("data-bsps-rtlh.geojson")
+.then(res=>res.json())
+.then(data=>{
+
+  dataDesa = data;
+
+  layerDesa = L.geoJSON(data,{
+    style: styleNormal,
+    onEachFeature: onEachFeature
+  }).addTo(map);
+
+  isiDropdown(data);
+  hitungData();
+
+});
 
 
 // ================= ON EACH FEATURE =================
 function onEachFeature(feature,layer){
 
-  layer.on("click", function(){
+  layer.on("click",function(){
 
-    zoomToFeature(layer);
-
-    kecamatanDropdown.value = feature.properties.KECAMATAN;
     desaDropdown.value = feature.properties.DESA;
+    kecamatanDropdown.value = feature.properties.KECAMATAN;
+
+    zoomToDesa(feature.properties.DESA);
+    hitungData();
 
   });
 
 }
 
 
-// ================= ZOOM KE FEATURE =================
-function zoomToFeature(layer){
+// ================= ZOOM KECAMATAN =================
+function zoomToKecamatan(namaKecamatan){
 
-  if(selectedFeatureLayer){
-    layerDesa.resetStyle(selectedFeatureLayer);
-  }
+  resetStyle();
 
-  selectedFeatureLayer = layer;
+  let bounds = L.latLngBounds();
+  let ada = false;
 
-  layer.setStyle(highlightStyle());
+  layerDesa.eachLayer(layer=>{
 
-  map.fitBounds(layer.getBounds(),{
-    maxZoom:15
+    if(layer.feature.properties.KECAMATAN === namaKecamatan){
+
+      bounds.extend(layer.getBounds());
+      layer.setStyle(styleHighlight());
+      ada = true;
+
+    }
+
   });
 
+  if(ada){
+    map.fitBounds(bounds);
+  }
+
+}
+
+
+// ================= ZOOM DESA =================
+function zoomToDesa(namaDesa){
+
+  resetStyle();
+
+  layerDesa.eachLayer(layer=>{
+
+    if(layer.feature.properties.DESA === namaDesa){
+
+      layer.setStyle(styleHighlight());
+
+      map.fitBounds(layer.getBounds(),{
+        maxZoom:15
+      });
+
+    }
+
+  });
+
+}
+
+
+// ================= RESET STYLE =================
+function resetStyle(){
+  layerDesa.setStyle(styleNormal);
 }
 
 
@@ -83,15 +129,17 @@ kecamatanDropdown.onchange = function(){
 
   desaDropdown.value = "Semua";
 
-  layerDesa.eachLayer(layer=>{
+  if(kecamatan === "Semua"){
 
-    if(layer.feature.properties.KECAMATAN === kecamatan){
+    resetStyle();
+    map.setView([-7.4,111.4],11);
+    hitungData();
+    return;
 
-      zoomToFeature(layer);
+  }
 
-    }
-
-  });
+  zoomToKecamatan(kecamatan);
+  hitungData();
 
 };
 
@@ -101,15 +149,47 @@ desaDropdown.onchange = function(){
 
   let desa = this.value;
 
-  layerDesa.eachLayer(layer=>{
+  if(desa === "Semua"){
+    resetStyle();
+    hitungData();
+    return;
+  }
 
-    if(layer.feature.properties.DESA === desa){
+  zoomToDesa(desa);
+  hitungData();
 
-      zoomToFeature(layer);
+};
 
-    }
+
+// ================= HITUNG DATA =================
+function hitungData(){
+
+  let rtlh = 0;
+
+  dataDesa.features.forEach(f => {
+
+    if(kecamatanDropdown.value !== "Semua" &&
+       f.properties.KECAMATAN !== kecamatanDropdown.value) return;
+
+    if(desaDropdown.value !== "Semua" &&
+       f.properties.DESA !== desaDropdown.value) return;
+
+    rtlh += Number(f.properties["RTLH " + selectedTahun]) || 0;
 
   });
+
+  rtlhText.textContent = rtlh;
+
+}
+
+
+// ================= SLIDER TAHUN =================
+slider.oninput = function(){
+
+  selectedTahun = this.value;
+  tahunLabel.textContent = selectedTahun;
+
+  hitungData();
 
 };
 
