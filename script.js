@@ -1,176 +1,120 @@
-document.addEventListener("DOMContentLoaded", function () {
+var map = L.map('map').setView([-7.4,111.4], 11);
 
-const FIELD_KEC="KECAMATAN";
-const FIELD_DESA="DESA";
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-const map=L.map("map");
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+let dataGeojson;
+let selectedTahun = 2025;
+let selectedKecamatan = "Semua";
+let selectedDesa = "Semua";
+let wilayahTerklik = null;
 
-const jenis=document.getElementById("jenis");
-const tahun=document.getElementById("tahun");
-const labelTahun=document.getElementById("labelTahun");
-const kecSelect=document.getElementById("kecamatan");
-const desaSelect=document.getElementById("desa");
-const prev=document.getElementById("prevTahun");
-const next=document.getElementById("nextTahun");
-const infoTotal=document.getElementById("infoTotal");
+const rtlhText = document.getElementById("rtlhCount");
+const bspsText = document.getElementById("bspsCount");
 
-labelTahun.textContent=tahun.value;
+fetch("data.geojson")
+.then(res => res.json())
+.then(data => {
 
-let geoData,geoLayer;
+  dataGeojson = data;
 
-/* AMBIL NILAI */
-function getValue(props,prefix){
-let f1=prefix+" "+tahun.value;
-let f2=prefix+"_"+tahun.value;
-return props[f1]??props[f2]??0;
-}
+  isiDropdown(data);
 
-/* WARNA */
-function getColor(d){
-return d>50?'#084594':
-d>30?'#2171b5':
-d>20?'#4292c6':
-d>10?'#6baed6':
-d>0?'#9ecae1':'#f1f1f1';
-}
+  L.geoJSON(data,{
 
-function style(feature){
-return{
-fillColor:getColor(getValue(feature.properties,jenis.value)),
-weight:1,
-color:"#666",
-fillOpacity:0.7
-};
-}
+    onEachFeature: function(feature, layer){
 
-function highlight(layer){
-layer.setStyle({color:"red",weight:3,dashArray:"5,5"});
-}
+      layer.on("click", function(){
 
-/* HITUNG TOTAL */
-function hitungTotal(features){
+        wilayahTerklik = feature.properties.kecamatan;
 
-let rtlh=0,bsps=0;
+        selectedKecamatan = feature.properties.kecamatan;
+        document.getElementById("kecamatanDropdown").value = selectedKecamatan;
 
-features.forEach(f=>{
-rtlh+=getValue(f.properties,"RTLH");
-bsps+=getValue(f.properties,"BSPS");
-});
+        hitungData();
+      });
 
-infoTotal.innerHTML=
-`RTLH: ${rtlh.toLocaleString()} | BSPS: ${bsps.toLocaleString()}`;
-}
+    }
 
-/* LOAD DATA */
-fetch("./data-bsps-rtlh.geojson")
-.then(res=>res.json())
-.then(data=>{
+  }).addTo(map);
 
-geoData=data;
-
-geoLayer=L.geoJSON(data,{
-style:style,
-onEachFeature:(f,l)=>{
-l.bindPopup(`
-<b>Desa:</b> ${f.properties[FIELD_DESA]}<br>
-<b>Kecamatan:</b> ${f.properties[FIELD_KEC]}<br>
-<b>Jumlah:</b> ${getValue(f.properties,jenis.value)}
-`);
-}
-}).addTo(map);
-
-map.fitBounds(geoLayer.getBounds());
-
-isiKecamatan();
-hitungTotal(geoData.features);
+  hitungData();
 
 });
 
-/* ISI KECAMATAN */
-function isiKecamatan(){
-let kec=[...new Set(geoData.features.map(f=>f.properties[FIELD_KEC]))].sort();
-kec.forEach(k=>kecSelect.innerHTML+=`<option value="${k}">${k}</option>`);
-}
+function isiDropdown(data){
 
-/* FILTER KEC */
-kecSelect.onchange=function(){
+  let kecamatan = new Set();
+  let desa = new Set();
 
-desaSelect.innerHTML=`<option value="">Semua Desa</option>`;
-geoLayer.resetStyle();
+  data.features.forEach(f=>{
+    kecamatan.add(f.properties.kecamatan);
+    desa.add(f.properties.desa);
+  });
 
-if(!this.value){
-map.fitBounds(geoLayer.getBounds());
-hitungTotal(geoData.features);
-return;
-}
+  kecamatan.forEach(k=>{
+    kecamatanDropdown.innerHTML += `<option value="${k}">${k}</option>`;
+  });
 
-let filtered=geoData.features.filter(f=>f.properties[FIELD_KEC]==this.value);
-
-map.fitBounds(L.geoJSON(filtered).getBounds());
-hitungTotal(filtered);
-
-geoLayer.eachLayer(l=>{
-if(l.feature.properties[FIELD_KEC]==this.value)highlight(l);
-});
-
-let desa=[...new Set(filtered.map(f=>f.properties[FIELD_DESA]))].sort();
-desa.forEach(d=>desaSelect.innerHTML+=`<option value="${d}">${d}</option>`);
-
-};
-
-/* FILTER DESA */
-desaSelect.onchange=function(){
-
-geoLayer.resetStyle();
-
-let filtered=geoData.features.filter(f=>f.properties[FIELD_DESA]==this.value);
-
-hitungTotal(filtered);
-
-geoLayer.eachLayer(l=>{
-if(l.feature.properties[FIELD_DESA]==this.value){
-highlight(l);
-map.fitBounds(l.getBounds());
-}
-});
-
-};
-
-/* UPDATE MAP */
-function updateMap(){
-
-if(!geoLayer)return;
-
-labelTahun.textContent=tahun.value;
-
-geoLayer.setStyle(style);
-
-geoLayer.eachLayer(l=>{
-l.setPopupContent(`
-<b>Desa:</b> ${l.feature.properties[FIELD_DESA]}<br>
-<b>Kecamatan:</b> ${l.feature.properties[FIELD_KEC]}<br>
-<b>Jumlah:</b> ${getValue(l.feature.properties,jenis.value)}
-`);
-});
-
-if(desaSelect.value){
-desaSelect.onchange();
-}
-else if(kecSelect.value){
-kecSelect.onchange();
-}
-else{
-hitungTotal(geoData.features);
-}
+  desa.forEach(d=>{
+    desaDropdown.innerHTML += `<option value="${d}">${d}</option>`;
+  });
 
 }
 
-/* EVENT */
-tahun.oninput=updateMap;
-jenis.onchange=updateMap;
+function hitungData(){
 
-prev.onclick=()=>{tahun.stepDown();updateMap();}
-next.onclick=()=>{tahun.stepUp();updateMap();}
+  let rtlh = 0;
+  let bsps = 0;
 
-});
+  dataGeojson.features.forEach(f=>{
+
+    if(selectedKecamatan !== "Semua" && f.properties.kecamatan !== selectedKecamatan) return;
+    if(selectedDesa !== "Semua" && f.properties.desa !== selectedDesa) return;
+    if(wilayahTerklik && f.properties.kecamatan !== wilayahTerklik) return;
+
+    rtlh += Number(f.properties["rtlh_"+selectedTahun]) || 0;
+    bsps += Number(f.properties["bsps_"+selectedTahun]) || 0;
+
+  });
+
+  rtlhText.innerHTML = rtlh;
+  bspsText.innerHTML = bsps;
+
+}
+
+kecamatanDropdown.onchange = function(){
+  selectedKecamatan = this.value;
+  wilayahTerklik = null;
+  hitungData();
+}
+
+desaDropdown.onchange = function(){
+  selectedDesa = this.value;
+  hitungData();
+}
+
+tahunSlider.oninput = function(){
+  selectedTahun = this.value;
+  document.getElementById("tahunLabel").innerText = selectedTahun;
+  hitungData();
+}
+
+function nextYear(){
+  if(selectedTahun < 2025){
+    selectedTahun++;
+    updateTahun();
+  }
+}
+
+function prevYear(){
+  if(selectedTahun > 2021){
+    selectedTahun--;
+    updateTahun();
+  }
+}
+
+function updateTahun(){
+  tahunSlider.value = selectedTahun;
+  document.getElementById("tahunLabel").innerText = selectedTahun;
+  hitungData();
+}
