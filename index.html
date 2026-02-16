@@ -1,17 +1,69 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<title>WebGIS RTLH</title>
+  <meta charset="utf-8" />
+  <title>Peta RTLH Ngawi</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="style.css">
+  <!-- LEAFLET CSS -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <style>
+    html, body{
+      height:100%;
+      margin:0;
+    }
+
+    #map{
+      height:100vh;
+      width:100%;
+    }
+
+    .control-panel{
+      position:absolute;
+      top:15px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:1000;
+
+      background:white;
+      padding:12px 16px;
+      border-radius:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.3);
+      text-align:center;
+    }
+
+    .tahun-control{
+      margin:8px 0;
+    }
+
+    #tahunSlider{
+      width:220px;
+    }
+
+    .info-box{
+      position:absolute;
+      bottom:20px;
+      left:20px;
+      z-index:1000;
+
+      background:white;
+      padding:12px 16px;
+      border-radius:10px;
+      box-shadow:0 3px 8px rgba(0,0,0,0.3);
+      font-size:14px;
+      line-height:1.5;
+    }
+  </style>
+
 </head>
 <body>
 
 <div id="map">
 
+  <!-- PANEL ATAS -->
   <div class="control-panel">
 
     <select id="kecamatanDropdown">
@@ -28,10 +80,15 @@
       <button onclick="nextYear()">></button>
     </div>
 
-    <input type="range" id="tahunSlider" min="2021" max="2025" value="2025">
+    <input type="range"
+           id="tahunSlider"
+           min="2021"
+           max="2025"
+           value="2025">
 
   </div>
 
+  <!-- INFO BOX -->
   <div id="infoBox" class="info-box" style="display:none;">
     <b id="infoWilayah"></b><br>
     Desa : <span id="infoDesa"></span><br>
@@ -41,7 +98,10 @@
 
 </div>
 
+<!-- LEAFLET JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- SCRIPT KAMU -->
 <script src="script.js"></script>
 
 </body>
