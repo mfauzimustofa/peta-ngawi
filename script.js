@@ -5,11 +5,12 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let layerDesa;
 let dataDesa;
 let wilayahAktif = null;
-
 let selectedTahun = 2025;
 
 const slider = document.getElementById("tahunSlider");
 const tahunLabel = document.getElementById("tahunLabel");
+const kecamatanDropdown = document.getElementById("kecamatanDropdown");
+const desaDropdown = document.getElementById("desaDropdown");
 
 
 // ================= LOAD GEOJSON =================
@@ -30,7 +31,7 @@ fetch("data-bsps-rtlh.geojson")
 });
 
 
-// ================= DROPDOWN =================
+// ================= ISI DROPDOWN =================
 function isiDropdown(data){
 
   let kec = new Set();
@@ -59,7 +60,10 @@ function onEachFeature(feature,layer){
 
     wilayahAktif = feature.properties;
 
-    tampilkanInfo(feature.properties);
+    kecamatanDropdown.value = feature.properties.KECAMATAN;
+    desaDropdown.value = feature.properties.DESA;
+
+    tampilkanInfo(wilayahAktif);
 
   });
 
@@ -107,9 +111,11 @@ function hitungKabupaten(){
 kecamatanDropdown.onchange = function(){
 
   let kec = this.value;
+  desaDropdown.value = "Semua";
 
   if(kec==="Semua"){
     map.setView([-7.4,111.4],11);
+    wilayahAktif = null;
     hitungKabupaten();
     return;
   }
@@ -129,10 +135,37 @@ kecamatanDropdown.onchange = function(){
 };
 
 
+// ================= DROPDOWN DESA =================
+desaDropdown.onchange = function(){
+
+  let desa = this.value;
+
+  if(desa==="Semua"){
+    wilayahAktif = null;
+    hitungKabupaten();
+    return;
+  }
+
+  layerDesa.eachLayer(layer=>{
+
+    if(layer.feature.properties.DESA===desa){
+
+      map.fitBounds(layer.getBounds());
+
+      wilayahAktif = layer.feature.properties;
+      tampilkanInfo(wilayahAktif);
+
+    }
+
+  });
+
+};
+
+
 // ================= SLIDER =================
 slider.oninput = function(){
 
-  selectedTahun = this.value;
+  selectedTahun = parseInt(this.value);
   tahunLabel.textContent = selectedTahun;
 
   if(wilayahAktif){
