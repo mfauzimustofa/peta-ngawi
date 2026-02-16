@@ -1,43 +1,65 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <title>WebGIS RTLH BSPS</title>
+<meta charset="utf-8"/>
+<title>Peta RTLH BSPS Ngawi</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
-  <style>
-    body { margin:0; font-family: Arial, sans-serif; }
+<style>
 
-    #map { height: 100vh; position: relative; }
+html, body{
+  margin:0;
+  padding:0;
+  height:100%;
+  font-family: sans-serif;
+}
 
-    .control-panel{
-      position:absolute;
-      top:10px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:1000;
-      background:white;
-      padding:10px 15px;
-      border-radius:10px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.2);
-    }
+#map{
+  height:100%;
+}
 
-    #map-center-info{
-      position:absolute;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      background:rgba(255,255,255,0.9);
-      padding:12px 20px;
-      border-radius:12px;
-      font-size:22px;
-      font-weight:bold;
-      z-index:1000;
-      pointer-events:none;
-    }
-  </style>
+/* PANEL ATAS */
+.control-panel{
+  position:absolute;
+  top:15px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:1000;
+  background:white;
+  padding:12px;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.25);
+  text-align:center;
+}
+
+/* ANGKA TENGAH PETA */
+#map-center-info{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(255,255,255,0.9);
+  padding:12px 22px;
+  border-radius:12px;
+  font-size:22px;
+  font-weight:bold;
+  z-index:999;
+  pointer-events:none;
+}
+
+select, button{
+  padding:4px 8px;
+  margin:2px;
+}
+
+input[type=range]{
+  width:200px;
+}
+
+</style>
 </head>
+
 <body>
 
 <div id="map"></div>
@@ -52,13 +74,13 @@
     <option value="Semua">Semua Desa</option>
   </select>
 
-  <br><br>
+  <br>
 
   <button onclick="prevYear()">&#60;</button>
   <span id="tahunLabel">2025</span>
   <button onclick="nextYear()">&#62;</button>
 
-  <br><br>
+  <br>
 
   <input type="range" id="tahunSlider" min="2021" max="2025" value="2025">
 
