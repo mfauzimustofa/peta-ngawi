@@ -1,32 +1,48 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Kontrol Tahun</title>
+<meta charset="utf-8"/>
+<title>WebGIS RTLH</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="panel">
+<div id="map">
 
-  <select>
-    <option>Semua Kecamatan</option>
-  </select>
+  <div class="control-panel">
 
-  <select>
-    <option>Semua Desa</option>
-  </select>
+    <select id="kecamatanDropdown">
+      <option value="Semua">Semua Kecamatan</option>
+    </select>
 
-  <div class="tahun-control">
-    <button id="prevBtn"><</button>
-    <span id="tahunLabel">2025</span>
-    <button id="nextBtn">></button>
+    <select id="desaDropdown">
+      <option value="Semua">Semua Desa</option>
+    </select>
+
+    <div class="tahun-control">
+      <button onclick="prevYear()"><</button>
+      <span id="tahunLabel">2025</span>
+      <button onclick="nextYear()">></button>
+    </div>
+
+    <input type="range" id="tahunSlider" min="2021" max="2025" value="2025">
+
   </div>
 
-  <input type="range" id="tahunSlider" min="2021" max="2025" value="2025">
+  <div id="infoBox" class="info-box" style="display:none;">
+    <b id="infoWilayah"></b><br>
+    Desa : <span id="infoDesa"></span><br>
+    RTLH : <span id="infoRTLH"></span><br>
+    Tahun : <span id="infoTahun"></span>
+  </div>
 
 </div>
 
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
